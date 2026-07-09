@@ -56,7 +56,7 @@ export default function ZakatCalculator() {
           zakat: zakatDue.toFixed(2), // .toFixed(2) rounds it to 2 decimal places
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#aaffaa'
+          colorCode: '#528852'
         });
       } else {
         // Save an object showing they are exempt
@@ -65,7 +65,7 @@ export default function ZakatCalculator() {
           zakat: "0.00",
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#ffaaaa'
+          colorCode: '#9a4949'
         });
       }
     } catch (err) {
