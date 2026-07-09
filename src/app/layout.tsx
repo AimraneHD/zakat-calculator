@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: 'Zakat Calculator | Real-Time Metal Prices',
-  description: 'A free, fast Zakat calculator using live global market prices for gold and silver nisab thresholds.',
+  description: 'A free, fast Zakat calculator using live global market prices for gold nisab thresholds.',
 }
 
 export default function RootLayout({
