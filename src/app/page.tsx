@@ -87,8 +87,8 @@ export default function ZakatCalculator() {
   }, []);
   
   return (
-    <div className="p-4 text-center bg-black text-white" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-      <div className=" p-4 bg-[#bbbbbb]" style={{borderRadius: 5}}>
+    <div className="p-4 text-center" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+      <div className=" p-4 bg-[#222222]" style={{borderRadius: 5}}>
         <h1>Zakat Calculator</h1>
         <br/>
         <ul>
@@ -128,11 +128,11 @@ export default function ZakatCalculator() {
         <button 
           onClick={handleCalculate}
           disabled={calculating}
-          className="mt-4 p-2 bg-[#555555] text-[#aaffbb]" 
+          className="mt-4 p-2" 
           style={{
             borderRadius: 5,
-            backgroundColor: calculating ? '#888888' : '#555555',
-            color: calculating ? '#ddffee' : '#aaffbb'
+            backgroundColor: calculating ? '#696969' : '#353535',
+            color: calculating ? '#dbebe3' : '#96cca1'
           }}
         >
           {calculating ? "Fetching live data..." : "Calculate Zakat"}
