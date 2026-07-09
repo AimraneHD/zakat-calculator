@@ -147,13 +147,13 @@ export default function ZakatCalculator() {
           <h2>Your Zakat Result</h2>
           { results.eligible ? (
             <div>
-              <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency}</label>
+              <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
               <br/>
               <label>Your zakat due is: {results.zakat} {results.currency}</label>
             </div>
           ) : (
             <div>
-              <label>Your amount of money does NOT exceed the nisab of {results.nisabThreshold} {results.currency} as of today</label>
+              <label>Your amount of money does NOT exceed the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
               <br/>
               <label>You are exempt from paying Zakat at the moment</label>
             </div>
