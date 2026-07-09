@@ -87,7 +87,7 @@ export default function ZakatCalculator() {
   }, []);
   
   return (
-    <div className="p-4 text-center" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+    <div className="p-4 text-center bg-black text-white" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
       <div className=" p-4 bg-[#bbbbbb]" style={{borderRadius: 5}}>
         <h1>Zakat Calculator</h1>
         <br/>
