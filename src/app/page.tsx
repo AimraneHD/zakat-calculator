@@ -2,11 +2,16 @@
 
 import { useEffect, useState } from "react";
 
+// apparently this abomination of a gibberish removes the spinners...
+const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
+
 export default function ZakatCalculator() {
   
   const [country, setCountry] = useState("");
   const [countries, setCountries] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [countryError, setCountryError] = useState(false);
 
   const [amount, setAmount] = useState("");
   const [nisab, setNisab] = useState("85.00");
@@ -18,8 +23,15 @@ export default function ZakatCalculator() {
 
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!country.includes(" - ")) {
+      setCountryError(true);
+      setResults(null)
+      return; // idk how to stop here
+    }
 
     setCalculating(true);
+    setCountryError(false);
 
     try {
       // get the chosen currency
@@ -74,7 +86,6 @@ export default function ZakatCalculator() {
     } finally {
       setCalculating(false);
     }
-
   };
 
   useEffect(() => {
@@ -85,19 +96,44 @@ export default function ZakatCalculator() {
       setLoading(false);
     })
   }, []);
-  
+
+  const i_just_wanna_see_something = 21;
+  let stringthingy = "";
+  for(let i = 0; i < i_just_wanna_see_something; i++) {
+    stringthingy += "-";
+  }
+  stringthingy += "|";
+  for(let i = 0; i < i_just_wanna_see_something; i++) {
+    stringthingy += "-";
+  }
+  stringthingy += "|";
+  for(let i = 0; i < i_just_wanna_see_something; i++) {
+    stringthingy += "-";
+  }
   return (
-    <div className="p-4 text-center" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+    <div className="p-4 text-center flex flex-col items-center justify-center">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
-      <div className=" p-4 bg-[#222222]" style={{borderRadius: 5}}>
+      
+      <div className="p-4 bg-[#222222] rounded-md">
         <h1>Zakat Calculator</h1>
+        {loading ? (<p>Fetching countries and live market data...</p>) : (<br/>)}
+        
+        {countryError && (
+          <div className="text-[#9a4949] font-bold mb-4">
+            Fill in the fields properly!<br/>
+            Example: Don't write just "Morocco" or just "MAD", select instead "Morocco - MAD"
+          </div>
+        )}
+
         <br/>
-        <ul>
-          <li>
-            <label className="mr-10">Which country are you from? </label>
+        <div className="grid grid-cols-[auto_auto] gap-4 items-center justify-center text-right">          
+          <label className="pr-4">Which country are you from? </label>
+          <div className="pl-4 text-left">
             <input
+              className="bg-[#333333] text-white"
               list="countries_list"
-              placeholder="Enter your country..."
+              disabled={loading}
+              placeholder={loading ? "Wait..." : "Enter your country..."}
               value={country}
               onChange={(e) => setCountry(e.target.value)}
             />
@@ -112,19 +148,31 @@ export default function ZakatCalculator() {
                 );
               })}
             </datalist>
-          </li>
-          <li>
-            <label className='mr-10'>How much money do you have at the moment? </label>
-            <input type='number' value={amount} onChange={(e) => setAmount(e.target.value)}/>
-          </li>
-          <li>
-            <label className="mr-10">What nisab weight value do you use? </label>
-            <select value={nisab} onChange={(e) => setNisab(e.target.value)}>
+          </div>
+          
+          <label className="pr-4">How much money do you have at the moment TOTALLY? </label>
+          <div className="pl-4 text-left">
+            <input
+              className={`bg-[#333333] text-white ${remove_arrow_spinners}`}
+              type='number'
+              disabled={loading}
+              placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
+              value={amount} onChange={(e) => setAmount(e.target.value)}/>
+          </div>
+          
+          <label className="pr-4">What nisab weight value do you use? </label>
+          <div className="pl-4 text-left">
+            <select
+              className="bg-[#333333] text-white"
+              disabled={loading}
+              value={nisab}
+              onChange={(e) => setNisab(e.target.value)}
+            >
               <option value="87.48">87.48g of pure gold (Hanafi)</option>
               <option value="85.00">85.00g of pure gold (Maliki, Shafi'i, Hanbali)</option>
             </select>
-          </li>
-        </ul>
+          </div>
+        </div>
         
         <button 
           onClick={handleCalculate}
