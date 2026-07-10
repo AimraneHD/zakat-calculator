@@ -122,18 +122,26 @@ export default function ZakatCalculator() {
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
       <div className="p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-full">
-        <h1>Zakat Calculator</h1>
-        {loading ? (<p>Fetching countries and live market data...</p>) : (<br/>)}
         
+        {/* Replace from your <h1> down to your second error block with this: */}
+        <h1 className="text-3xl font-black text-emerald-400 tracking-tight mb-2">
+          Zakat Calculator</h1>
+        {loading ? (
+          <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries and live market data...</p>
+        ) : (
+          <div className="h-4" />
+        )}
+
         {countryError && (
-          <div className="text-[#9a4949] font-bold mb-4">
-            Fill in the country field properly!<br/>
-            Example: Don't write just "Morocco" or just "MAD", select instead "Morocco - MAD"
+          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left">
+            You forgot to fill in the country field properly!<br/>
+            <span className="text-neutral-400 font-normal">
+              Example: instead of writing just "Morocco" or just "MAD", select "Morocco - MAD".</span>
           </div>
         )}
         {amountError && (
-          <div className="text-[#9a4949] font-bold mb-4">
-            You forgot to fill in the total amount field!<br/>
+          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left">
+            You forgot to fill in the total amount field!
           </div>
         )}
 
@@ -162,7 +170,7 @@ export default function ZakatCalculator() {
             </datalist>
           </div>
           
-          <label className="pr-4">How much money do you have at the moment TOTALLY? </label>
+          <label className="pr-4">total money / wealth? </label>
           <div className="pl-4 text-left">
             <input
               className={`${premium_style} ${remove_arrow_spinners}`}
