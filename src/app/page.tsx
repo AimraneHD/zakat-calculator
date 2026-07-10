@@ -177,12 +177,11 @@ export default function ZakatCalculator() {
         <button 
           onClick={handleCalculate}
           disabled={calculating}
-          className="mt-4 p-2" 
-          style={{
-            borderRadius: 5,
-            backgroundColor: calculating ? '#696969' : '#353535',
-            color: calculating ? '#dbebe3' : '#96cca1'
-          }}
+          className={`mt-6 p-3 rounded-lg font-semibold transition-all ${
+            calculating 
+              ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
+              : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
+          }`}
         >
           {calculating ? "Fetching live data..." : "Calculate Zakat"}
         </button>
