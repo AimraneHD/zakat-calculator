@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
+// premium stylizing by GEMINI
+const premium_style = "bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 
 export default function ZakatCalculator() {
   
@@ -12,6 +14,7 @@ export default function ZakatCalculator() {
   const [loading, setLoading] = useState(true);
 
   const [countryError, setCountryError] = useState(false);
+  const [amountError, setAmountError] = useState(false);
 
   const [amount, setAmount] = useState("");
   const [nisab, setNisab] = useState("85.00");
@@ -23,15 +26,19 @@ export default function ZakatCalculator() {
 
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!country.includes(" - ")) {
-      setCountryError(true);
-      setResults(null)
-      return; // idk how to stop here
+
+    setCountryError(false);
+    setAmountError(false);
+
+    if (amount === "" || !country.includes(" - ")) {
+      if (amount === "") { setAmountError(true); }
+      if (!country.includes(" - ")) { setCountryError(true); }
+      return;
     }
 
     setCalculating(true);
     setCountryError(false);
+    setAmountError(false);
 
     try {
       // get the chosen currency
@@ -68,7 +75,7 @@ export default function ZakatCalculator() {
           zakat: zakatDue.toFixed(2), // .toFixed(2) rounds it to 2 decimal places
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#528852'
+          colorCode: '#10b981'
         });
       } else {
         // Save an object showing they are exempt
@@ -77,7 +84,7 @@ export default function ZakatCalculator() {
           zakat: "0.00",
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#9a4949'
+          colorCode: '#ef4444'
         });
       }
     } catch (err) {
@@ -114,14 +121,19 @@ export default function ZakatCalculator() {
     <div className="p-4 text-center flex flex-col items-center justify-center">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
-      <div className="p-4 bg-[#222222] rounded-md">
+      <div className="p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-full">
         <h1>Zakat Calculator</h1>
         {loading ? (<p>Fetching countries and live market data...</p>) : (<br/>)}
         
         {countryError && (
           <div className="text-[#9a4949] font-bold mb-4">
-            Fill in the fields properly!<br/>
+            Fill in the country field properly!<br/>
             Example: Don't write just "Morocco" or just "MAD", select instead "Morocco - MAD"
+          </div>
+        )}
+        {amountError && (
+          <div className="text-[#9a4949] font-bold mb-4">
+            You forgot to fill in the total amount field!<br/>
           </div>
         )}
 
@@ -130,7 +142,7 @@ export default function ZakatCalculator() {
           <label className="pr-4">Which country are you from? </label>
           <div className="pl-4 text-left">
             <input
-              className="bg-[#333333] text-white"
+              className={`${premium_style}`}
               list="countries_list"
               disabled={loading}
               placeholder={loading ? "Wait..." : "Enter your country..."}
@@ -153,7 +165,7 @@ export default function ZakatCalculator() {
           <label className="pr-4">How much money do you have at the moment TOTALLY? </label>
           <div className="pl-4 text-left">
             <input
-              className={`bg-[#333333] text-white ${remove_arrow_spinners}`}
+              className={`${premium_style} ${remove_arrow_spinners}`}
               type='number'
               disabled={loading}
               placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
@@ -163,7 +175,7 @@ export default function ZakatCalculator() {
           <label className="pr-4">What nisab weight value do you use? </label>
           <div className="pl-4 text-left">
             <select
-              className="bg-[#333333] text-white"
+              className={`${premium_style}`}
               disabled={loading}
               value={nisab}
               onChange={(e) => setNisab(e.target.value)}
@@ -185,13 +197,19 @@ export default function ZakatCalculator() {
         >
           {calculating ? "Fetching live data..." : "Calculate Zakat"}
         </button>
-      
-        
       </div>
       
+      {/*-------- RESULTS !!! ---------*/}
+
       { results && (
         
-        <div className="p-5 m-10" style={{backgroundColor: results.colorCode, borderRadius: 5, display: 'flex', flexDirection: 'column', alignItems:'center', justifyContent: 'center'}}>
+        <div
+          className="p-6 mt-6 max-w-xl w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
+          style={{
+            backgroundColor: `${results.colorCode}a0`, 
+            borderColor: `${results.colorCode}bb`
+          }}
+        >
           <h2>Your Zakat Result</h2>
           { results.eligible ? (
             <div>
