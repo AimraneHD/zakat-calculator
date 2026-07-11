@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
+
 // premium stylizing by GEMINI
 const premium_style = "bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 
@@ -127,7 +128,7 @@ export default function ZakatCalculator() {
         <h1 className="text-3xl font-black text-emerald-400 tracking-tight mb-2">
           Zakat Calculator</h1>
         {loading ? (
-          <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries and live market data...</p>
+          <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries...</p>
         ) : (
           <div className="h-4" />
         )}
@@ -203,7 +204,7 @@ export default function ZakatCalculator() {
               : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
           }`}
         >
-          {calculating ? "Fetching live data..." : "Calculate Zakat"}
+          {calculating ? "Fetching live market data..." : "Calculate Zakat"}
         </button>
       </div>
       
