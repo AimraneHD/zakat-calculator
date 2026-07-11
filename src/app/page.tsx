@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-// apparently this abomination of a gibberish removes the spinners...
+// apparently this abomination of a gibberish removes the arrow spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
 
 // premium stylizing by GEMINI
@@ -147,7 +147,7 @@ export default function ZakatCalculator() {
         )}
 
         <br/>
-        <div className="grid grid-cols-[auto_auto] gap-4 items-center justify-center text-right">          
+        <div className="grid grid-cols-1 md:grid-cols-[auto_auto] gap-4 items-center justify-center text-center md:text-right">
           <label className="pr-4">Which country are you from? </label>
           <div className="pl-4 text-left">
             <input
@@ -197,14 +197,14 @@ export default function ZakatCalculator() {
         
         <button 
           onClick={handleCalculate}
-          disabled={calculating}
+          disabled={calculating || loading}
           className={`mt-6 p-3 rounded-lg font-semibold transition-all ${
-            calculating 
+            calculating || loading
               ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
               : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
           }`}
         >
-          {calculating ? "Fetching live market data..." : "Calculate Zakat"}
+          { loading ? "Wait..." : (<label>{calculating ? "Fetching live data..." : "Calculate Zakat"}</label>) }
         </button>
       </div>
       
