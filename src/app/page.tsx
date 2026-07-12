@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-// apparently this abomination of a gibberish removes the arrow spinners...
+// apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
 
 // premium stylizing by GEMINI
-const premium_style = "bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
+const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 
 export default function ZakatCalculator() {
   
@@ -118,15 +118,16 @@ export default function ZakatCalculator() {
   for(let i = 0; i < i_just_wanna_see_something; i++) {
     stringthingy += "-";
   }
+
   return (
-    <div className="p-4 text-center flex flex-col items-center justify-center">
+    <div className="p-4 min-h-screen text-center flex flex-col items-center justify-center overflow-x-hidden">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
-      <div className="p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-full">
+      <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
         
-        {/* Replace from your <h1> down to your second error block with this: */}
-        <h1 className="text-3xl font-black text-emerald-400 tracking-tight mb-2">
+        <h1 className="text-2xl md:text-3xl font-black text-emerald-400 tracking-tight mb-2">
           Zakat Calculator</h1>
+        
         {loading ? (
           <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries...</p>
         ) : (
@@ -134,103 +135,112 @@ export default function ZakatCalculator() {
         )}
 
         {countryError && (
-          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left">
+          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left w-full">
             You forgot to fill in the country field properly!<br/>
             <span className="text-neutral-400 font-normal">
               Example: instead of writing just "Morocco" or just "MAD", select "Morocco - MAD".</span>
           </div>
         )}
+        
         {amountError && (
-          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left">
+          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left w-full">
             You forgot to fill in the total amount field!
           </div>
         )}
 
-        <br/>
-        <div className="grid grid-cols-1 md:grid-cols-[auto_auto] gap-4 items-center justify-center text-center md:text-right">
-          <label className="pr-4">Which country are you from? </label>
-          <div className="pl-4 text-left">
-            <input
-              className={`${premium_style}`}
-              list="countries_list"
-              disabled={loading}
-              placeholder={loading ? "Wait..." : "Enter your country..."}
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            />
-            <datalist id="countries_list">
-              {countries.filter((country: any) => country.currencies && country.name !== "Western Sahara" )
-              .map((country: any) => {
-                const countryString = `${country.name} - ${country.currencies[0].code}`;
-                return (
-                  <option key={country.name} value={countryString}>
-                    {countryString}
-                  </option>
-                );
-              })}
-            </datalist>
+        <div className="w-full flex flex-col gap-6 mt-2">
+          
+          {/* Country Input */}
+          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Which country are you from?</label>
+            <div className="w-full md:w-1/2 min-w-0">
+              <input
+                className={`${premium_style}`}
+                list="countries_list"
+                disabled={loading}
+                placeholder={loading ? "Wait..." : "Enter your country..."}
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              />
+              <datalist id="countries_list">
+                {countries.filter((country: any) => country.currencies && country.name !== "Western Sahara" )
+                .map((country: any) => {
+                  const countryString = `${country.name} - ${country.currencies[0].code}`;
+                  return (
+                    <option key={country.name} value={countryString}>
+                      {countryString}
+                    </option>
+                  );
+                })}
+              </datalist>
+            </div>
           </div>
           
-          <label className="pr-4">total money / wealth? </label>
-          <div className="pl-4 text-left">
-            <input
-              className={`${premium_style} ${remove_arrow_spinners}`}
-              type='number'
-              disabled={loading}
-              placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
-              value={amount} onChange={(e) => setAmount(e.target.value)}/>
+          {/* Amount Input */}
+          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Total money / wealth?</label>
+            <div className="w-full md:w-1/2 min-w-0">
+              <input
+                className={`${premium_style} ${remove_arrow_spinners}`}
+                type='number'
+                disabled={loading}
+                placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
+                value={amount} onChange={(e) => setAmount(e.target.value)}/>
+            </div>
           </div>
           
-          <label className="pr-4">What nisab weight value do you use? </label>
-          <div className="pl-4 text-left">
-            <select
-              className={`${premium_style}`}
-              disabled={loading}
-              value={nisab}
-              onChange={(e) => setNisab(e.target.value)}
-            >
-              <option value="87.48">87.48g of pure gold (Hanafi)</option>
-              <option value="85.00">85.00g of pure gold (Maliki, Shafi'i, Hanbali)</option>
-            </select>
+          {/* Nisab Select */}
+          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">What nisab weight value do you use?</label>
+            <div className="w-full md:w-1/2 min-w-0">
+              <select
+                className={`${premium_style}`}
+                disabled={loading}
+                value={nisab}
+                onChange={(e) => setNisab(e.target.value)}
+              >
+                <option value="87.48">87.48g of pure gold (Hanafi)</option>
+                <option value="85.00">85.00g of pure gold (Maliki, Shafi'i, Hanbali)</option>
+              </select>
+            </div>
           </div>
         </div>
         
         <button 
           onClick={handleCalculate}
           disabled={calculating || loading}
-          className={`mt-6 p-3 rounded-lg font-semibold transition-all ${
+          className={`mt-8 p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all ${
             calculating || loading
               ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
               : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
           }`}
         >
-          { loading ? "Wait..." : (<label>{calculating ? "Fetching live data..." : "Calculate Zakat"}</label>) }
+          { loading ? "Wait..." : (calculating ? "Fetching live data..." : "Calculate Zakat") }
         </button>
       </div>
       
       {/*-------- RESULTS !!! ---------*/}
 
       { results && (
-        
         <div
-          className="p-6 mt-6 max-w-xl w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
+          className="p-6 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
           style={{
             backgroundColor: `${results.colorCode}a0`, 
             borderColor: `${results.colorCode}bb`
           }}
         >
-          <h2>Your Zakat Result</h2>
+          <h2 className="font-bold mb-2">Your Zakat Result</h2>
           { results.eligible ? (
-            <div>
+            <div className="text-sm md:text-base">
               <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/>
-              <label>Your zakat due is: {results.zakat} {results.currency}</label>
+              <br/><br/>
+              <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
             </div>
           ) : (
-            <div>
+            <div className="text-sm md:text-base">
               <label>Your amount of money does NOT exceed the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/>
-              <label>You are exempt from paying Zakat at the moment</label>
+              <br/><br/>
+              <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
             </div>
           ) }
         </div>
