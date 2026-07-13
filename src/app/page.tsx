@@ -8,6 +8,10 @@ const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&
 // premium stylizing by GEMINI
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 
+const lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+
+const practice_mode = false;
+
 export default function ZakatCalculator() {
   
   const [country, setCountry] = useState("");
@@ -48,6 +52,11 @@ export default function ZakatCalculator() {
 
       // fetch metal price exchange rate
       const res = await fetch(`/api/prices/?currency=${currencyCode}`);
+      
+      if (!res.ok) {
+        throw new Error(`Server returned a ${res.status} error!`);
+      }
+      
       const data = await res.json();
       
       // example:
@@ -105,18 +114,20 @@ export default function ZakatCalculator() {
     })
   }, []);
 
-  const i_just_wanna_see_something = 21;
-  let stringthingy = "";
-  for(let i = 0; i < i_just_wanna_see_something; i++) {
-    stringthingy += "-";
-  }
-  stringthingy += "|";
-  for(let i = 0; i < i_just_wanna_see_something; i++) {
-    stringthingy += "-";
-  }
-  stringthingy += "|";
-  for(let i = 0; i < i_just_wanna_see_something; i++) {
-    stringthingy += "-";
+  if (practice_mode) {
+    const i_just_wanna_see_something = 21;
+    let stringthingy = "";
+    for(let i = 0; i < i_just_wanna_see_something; i++) {
+      stringthingy += "-";
+    }
+    stringthingy += "|";
+    for(let i = 0; i < i_just_wanna_see_something; i++) {
+      stringthingy += "-";
+    }
+    stringthingy += "|";
+    for(let i = 0; i < i_just_wanna_see_something; i++) {
+      stringthingy += "-";
+    }
   }
 
   return (
@@ -125,6 +136,7 @@ export default function ZakatCalculator() {
       
       <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
         
+        {/* ----------- TITLE OF THE PAGE ---------- */}
         <h1 className="text-2xl md:text-3xl font-black text-emerald-400 tracking-tight mb-2">
           Zakat Calculator</h1>
         
@@ -134,8 +146,9 @@ export default function ZakatCalculator() {
           <div className="h-4" />
         )}
 
+        {/* ----------- ERROR MESSAGES ------------- */}
         {countryError && (
-          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left w-full">
+          <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
             You forgot to fill in the country field properly!<br/>
             <span className="text-neutral-400 font-normal">
               Example: instead of writing just "Morocco" or just "MAD", select "Morocco - MAD".</span>
@@ -143,14 +156,15 @@ export default function ZakatCalculator() {
         )}
         
         {amountError && (
-          <div className="text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-xs font-semibold mb-4 text-left w-full">
+          <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
             You forgot to fill in the total amount field!
           </div>
         )}
 
+        {/* ----------- QUESTIONS AND INPUTS -------------- */}
         <div className="w-full flex flex-col gap-6 mt-2">
           
-          {/* Country Input */}
+          {/* -------------- COUNTRY INPUT ------------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Which country are you from?</label>
             <div className="w-full md:w-1/2 min-w-0">
@@ -176,7 +190,7 @@ export default function ZakatCalculator() {
             </div>
           </div>
           
-          {/* Amount Input */}
+          {/* ------------ AMOUNT INPUT -------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Total money / wealth?</label>
             <div className="w-full md:w-1/2 min-w-0">
@@ -189,7 +203,7 @@ export default function ZakatCalculator() {
             </div>
           </div>
           
-          {/* Nisab Select */}
+          {/* -------------- NISAB INPUT ------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">What nisab weight value do you use?</label>
             <div className="w-full md:w-1/2 min-w-0">
@@ -206,6 +220,7 @@ export default function ZakatCalculator() {
           </div>
         </div>
         
+        {/* --------- CALCULATE BUTTON ------------ */}
         <button 
           onClick={handleCalculate}
           disabled={calculating || loading}
@@ -223,7 +238,7 @@ export default function ZakatCalculator() {
 
       { results && (
         <div
-          className="p-6 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
+          className="p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
           style={{
             backgroundColor: `${results.colorCode}a0`, 
             borderColor: `${results.colorCode}bb`
@@ -245,6 +260,20 @@ export default function ZakatCalculator() {
           ) }
         </div>
       ) }
+
+      { practice_mode && (
+        <>
+        {/* our practice bookshelf */}
+        <div className="p-5 mt-6 max-w-xl md:w-full border text-center flex flex-col md:flex-row items-center justify-center rounded-2xl bg-[#121212] border-[#232323]">
+          <div className="md:w-1/4">
+            <h1 className="text-[#23ea83] text-center">💡 Did you know?</h1>
+          </div>
+          <div className="md:max-w-3/4">
+            <span className="text-xl">{lorem_ipsum.slice(0, 100)}</span>
+          </div>
+        </div>
+        </>
+      )}
     </div>
   )
 }
