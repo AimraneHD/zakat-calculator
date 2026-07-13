@@ -7,6 +7,8 @@ const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&
 
 // premium stylizing by GEMINI
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
+const premium_div = "box-border p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]";
+const premium_button = "mt-8 p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all";
 
 const lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 
@@ -29,8 +31,46 @@ export default function ZakatCalculator() {
   const [calculating, setCalculating] = useState(false);
   const [results, setResults] = useState<any>(null);
 
-  const handleCalculate = async (e: React.FormEvent) => {
+  const [opinion, setOpinion] = useState("");
+  const [username, setUsername] = useState("");
+  const [submitError, setSubmitError] = useState(false);
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  const sendOpinion = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setSubmitError(false);
+    setFeedbackSent(false);
+
+    try {
+      const res = await fetch('/api/feedback/', {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          name: username,
+          opinion: opinion
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server threw an eror or soemthing idk ${res.status}`);
+      }
+
+      setFeedbackSent(true);
+
+    } catch (err) {
+      console.log(`sum happened, idk: ${err}`);
+      setSubmitError(true);
+    }
+  }
+
+  const handleCalculate = async (e: React.FormEvent) => {
+    e.preventDefault(); // this prevented the website reloading before even finishing
+                        // calculating zakat, i dont even remember-
+                        // -what would happen,
+                        // i should've commented what this does
 
     setCountryError(false);
     setAmountError(false);
@@ -164,15 +204,17 @@ export default function ZakatCalculator() {
         {/* ----------- QUESTIONS AND INPUTS -------------- */}
         <div className="w-full flex flex-col gap-6 mt-2">
           
-          {/* -------------- COUNTRY INPUT ------------------- */}
+          {/* -------------- CURRENCY INPUT ------------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Which country are you from?</label>
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+              Which currency do you use?
+            </label>
             <div className="w-full md:w-1/2 min-w-0">
               <input
                 className={`${premium_style}`}
                 list="countries_list"
                 disabled={loading}
-                placeholder={loading ? "Wait..." : "Enter your country..."}
+                placeholder={loading ? "Wait..." : "Enter your currency..."}
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               />
@@ -192,7 +234,9 @@ export default function ZakatCalculator() {
           
           {/* ------------ AMOUNT INPUT -------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">Total money / wealth?</label>
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+              Total money / wealth?
+            </label>
             <div className="w-full md:w-1/2 min-w-0">
               <input
                 className={`${premium_style} ${remove_arrow_spinners}`}
@@ -205,7 +249,9 @@ export default function ZakatCalculator() {
           
           {/* -------------- NISAB INPUT ------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">What nisab weight value do you use?</label>
+            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+              What nisab weight value do you use?
+            </label>
             <div className="w-full md:w-1/2 min-w-0">
               <select
                 className={`${premium_style}`}
@@ -234,6 +280,60 @@ export default function ZakatCalculator() {
         </button>
       </div>
       
+      {/* ------------- USER'S HONEST OPINION ---------------- */}
+      {!feedbackSent ? (
+        <div className={`${premium_div} bg-[#121212] border-[#232323]`}>
+          <h2 className="font-medium mb-5 text-xl text-emerald-300">
+            What is your honest opinion about this website?
+          </h2>
+          <input
+            id="honest_opinion"
+            type='text'
+            value={opinion}
+            placeholder="Your honest opinion..."
+            className={`${premium_style}`}
+            onChange={(e) => setOpinion(e.target.value)}
+          />
+          <input
+            id="username"
+            type='text'
+            value={username}
+            placeholder="Your name..."
+            className={`m-3 ${premium_style}`}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <label className="text-s text-[#bbbbbb]">
+            if you DON'T want to share your name, just leave the field empty
+          </label>
+          <button
+            className={`${premium_button} ${
+              (opinion === "") ? "cursor-not-allowed" : "cursor-pointer"
+            } ${
+              (opinion === "")
+                ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
+                : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
+            }`}
+            onClick={sendOpinion}
+            disabled={opinion === ""}
+          >
+            submit
+          </button>
+          {submitError && (
+            <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-5 m-5 text-xs font-semibold mb-4 text-left w-full">
+              Error: something unexpected happened submitting this message :(<br/>
+              Try again later...
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={`${premium_div} bg-[#121212] border-[#232323] text-center`}>
+          <h2 className="font-medium text-xl text-emerald-400">
+            Thank you for your feedback! 🚀
+          </h2>
+          <p className="text-sm text-neutral-400 mt-2">Your review was saved directly to the database.</p>
+        </div>
+      )}
+
       {/*-------- RESULTS !!! ---------*/}
 
       { results && (
