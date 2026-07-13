@@ -280,6 +280,34 @@ export default function ZakatCalculator() {
         </button>
       </div>
       
+
+      {/*-------- RESULTS !!! ---------*/}
+
+      { results && (
+        <div
+        className="p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
+        style={{
+          backgroundColor: `${results.colorCode}a0`, 
+          borderColor: `${results.colorCode}bb`
+        }}
+        >
+          <h2 className="font-bold mb-2">Your Zakat Result</h2>
+          { results.eligible ? (
+            <div className="text-sm md:text-base">
+              <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
+              <br/><br/>
+              <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
+            </div>
+          ) : (
+            <div className="text-sm md:text-base">
+              <label>Your amount of money does NOT exceed the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
+              <br/><br/>
+              <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
+            </div>
+          ) }
+        </div>
+      ) }
+
       {/* ------------- USER'S HONEST OPINION ---------------- */}
       {!feedbackSent ? (
         <div className={`${premium_div} bg-[#121212] border-[#232323]`}>
@@ -333,33 +361,6 @@ export default function ZakatCalculator() {
           <p className="text-sm text-neutral-400 mt-2">Your review was saved directly to the database.</p>
         </div>
       )}
-
-      {/*-------- RESULTS !!! ---------*/}
-
-      { results && (
-        <div
-          className="p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
-          style={{
-            backgroundColor: `${results.colorCode}a0`, 
-            borderColor: `${results.colorCode}bb`
-          }}
-        >
-          <h2 className="font-bold mb-2">Your Zakat Result</h2>
-          { results.eligible ? (
-            <div className="text-sm md:text-base">
-              <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/><br/>
-              <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
-            </div>
-          ) : (
-            <div className="text-sm md:text-base">
-              <label>Your amount of money does NOT exceed the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/><br/>
-              <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
-            </div>
-          ) }
-        </div>
-      ) }
 
       { practice_mode && (
         <>
