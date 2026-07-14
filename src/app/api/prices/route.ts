@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { adminDb } from "../../../../firebaseAdmin"; // Using the VIP Admin connection!
 
-const CHECK_INTERVAL = 12 // hours; i prefer it this way
-
-interface CachedRatesData {
-  apiData: any;
-  cachedAt: number;
-}
+const CHECK_INTERVAL = 12; // hours
 
 export const dynamic = "force-dynamic";
 
@@ -16,55 +10,61 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const currency = searchParams.get("currency") || "USD";
 
-  // 1. cacheRef first visits the database db, my firebase project, 
-  // then points to the folder "cached_rates", if it doesnt exist, it creates one, 
-  // then creates a document named the same string as currency, 
-  // for example "cached_rates/MAD"
-  const cacheRef = doc(db, "cached_rates", currency);
+  // 1. Reference the cached document using Admin SDK
+  // Instead of doc(db, ...), we use adminDb.collection(...).doc(...)
+  const cacheRef = adminDb.collection("cached_rates").doc(currency);
 
-  // 2. we use our hand (getDoc) to physically grab the document
-  const cacheSnap = await getDoc(cacheRef);
+  try {
+    // 2. Fetch the document using the Admin SDK
+    const cacheSnap = await cacheRef.get();
 
-  // 3. check if the folder exists in the first place
-  if (cacheSnap.exists()) {
-    // i. turn received response into readable data
-    const cachedData = cacheSnap.data();
+    // 3. Check if the document exists in the cache
+    // Note: In the Admin SDK, 'exists' is a boolean PROPERTY (cacheSnap.exists), 
+    // NOT a function (cacheSnap.exists()) like in the client SDK!
+    if (cacheSnap.exists) {
+      const cachedData = cacheSnap.data();
 
-    // ii. what time is it right now?
-    const now = Date.now();
-
-    // iii. CHECK_INTERVAL in ms
-    const CHECK_INTERVAL_ms = CHECK_INTERVAL * 3600 * 1000;
-
-    const cacheAge = now - cachedData.cachedAt; // im concerned here a lit bit cause the 
-                                                // cachedat method wasnt highlighted in the suggestion dropdown menu
-    
-    if (cacheAge < CHECK_INTERVAL_ms) {
-      console.log(`last ${currency} cache is less than ${CHECK_INTERVAL} hours old. serving from Firebase`);
-      
-      // return the cached data instead of the newly fetched data
-      return NextResponse.json(cachedData.apiData); // same concern here, apiData didnt pop up or auto fill by pressing TAB
+      if (cachedData) {
+        const now = Date.now();
+        const CHECK_INTERVAL_ms = CHECK_INTERVAL * 3600 * 1000;
+        const cacheAge = now - cachedData.cachedAt;
+        
+        if (cacheAge < CHECK_INTERVAL_ms) {
+          console.log(`last ${currency} cache is less than ${CHECK_INTERVAL} hours old. serving from Firebase`);
+          
+          // Return the cached data instead of making a new API call
+          return NextResponse.json(cachedData.apiData);
+        }
+      }
     }
+  } catch (dbError) {
+    // If Firebase reading fails for some reason, log it but don't crash 
+    // — we will just proceed to fetch fresh data below.
+    console.error("Database cache read failed, falling back to live fetch:", dbError);
   }
 
-  /* if we exceeded the first return statement, that means the cached_rates folder
-     doesnt exist. we'll fetch new fresh data, cache it, then return it */
+  /* If we exceeded the cache or it doesn't exist, fetch fresh data and cache it */
   try {
     const CURRENCY_URL = `https://api.metalpriceapi.com/v1/latest?api_key=${apiKey}&currencies=${currency},XAU`;
     const response = await fetch(CURRENCY_URL);
+    
+    if (!response.ok) {
+      throw new Error(`Metal Price API returned status ${response.status}`);
+    }
+    
     const data = await response.json();
 
-    await setDoc(cacheRef, {
+    // 4. Save the new data using Admin SDK
+    // Bypasses all security rules so you don't get "PERMISSION_DENIED"!
+    await cacheRef.set({
       apiData: data,
-      cachedAt: Date.now() // alright, now i understand why the previous apiData 
-                          // and cachedAt methods didnt pop up earlier
+      cachedAt: Date.now()
     });
 
     return NextResponse.json(data);
 
   } catch (err) {
     console.error("Backend fetching error:", err);
-    return NextResponse.json({error: "Backend fetching error", status: 500})
+    return NextResponse.json({ error: "Backend fetching error", status: 500 });
   }
-
 }
