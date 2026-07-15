@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     // 2. Reference the "feedback" collection in Firestore
     // Calling .doc() with no arguments tells Firestore to auto-generate a unique ID for this feedback
-    const feedbackRef = adminDb.collection("feedback").doc();
+    const feedbackRef = adminDb.collection("feedback").doc(current_time);
 
     // 3. Save the feedback securely
     // This bypasses all public write restrictions!

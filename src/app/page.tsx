@@ -35,10 +35,12 @@ export default function ZakatCalculator() {
   const [username, setUsername] = useState("");
   const [submitError, setSubmitError] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [sending, setSending] = useState(false);
 
   const sendOpinion = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    setSending(true);
     setSubmitError(false);
     setFeedbackSent(false);
 
@@ -63,6 +65,8 @@ export default function ZakatCalculator() {
     } catch (err) {
       console.log(`sum happened, idk: ${err}`);
       setSubmitError(true);
+    } finally {
+      setSending(false);
     }
   }
 
@@ -341,16 +345,16 @@ export default function ZakatCalculator() {
           </label>
           <button
             className={`${premium_button} ${
-              (opinion === "") ? "cursor-not-allowed" : "cursor-pointer"
+              (opinion === "" || sending) ? "cursor-not-allowed" : "cursor-pointer"
             } ${
-              (opinion === "")
+              (opinion === "" || sending)
                 ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
                 : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
             }`}
             onClick={sendOpinion}
-            disabled={opinion === ""}
+            disabled={opinion === "" || sending}
           >
-            submit
+            {sending ? "Submitting..." : "Submit"}
           </button>
           {submitError && (
             <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-5 m-5 text-xs font-semibold mb-4 text-left w-full">
