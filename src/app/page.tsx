@@ -181,9 +181,11 @@ export default function ZakatCalculator() {
       <label className="text-[#888888] text-s md:w-2/5 m-3">
         experienced devs, don't bully me and this wbesite please, im still learning lol
       </label>
-      <label className="text-[#888888] text-s md:w-2/5 m-3">
-        test {new Date().toLocaleString()}
-      </label>
+      { practice_mode && (
+        <label className="text-[#888888] text-s md:w-2/5 m-3">
+          test
+        </label>
+      )}
       <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
         
         {/* ----------- TITLE OF THE PAGE ---------- */}
