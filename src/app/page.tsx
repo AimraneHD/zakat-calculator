@@ -7,8 +7,11 @@ const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&
 
 // premium stylizing by GEMINI
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
-const premium_div = "box-border p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]";
-const premium_button = "mt-8 p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all";
+const premium_div = "box-border p-5 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]";
+const premium_div_2 = "p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center";
+/* i dont wanna remove the first premium_div because sometimes one of them works very well
+ and the other doesnt and sometimes the opposite */
+const premium_button = "p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all";
 
 const lorem_ipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
 
@@ -33,10 +36,13 @@ export default function ZakatCalculator() {
 
   const [opinion, setOpinion] = useState("");
   const [username, setUsername] = useState("");
+  const [suggestion, setSuggestion] = useState("");
+
   const [submitError, setSubmitError] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [sending, setSending] = useState(false);
 
+  /* --------------- HANDLE OPINION SUBMISSION --------------- */
   const sendOpinion = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -52,7 +58,8 @@ export default function ZakatCalculator() {
         },
         body: JSON.stringify({
           name: username,
-          opinion: opinion
+          opinion: opinion,
+          suggestion: suggestion
         })
       });
 
@@ -70,6 +77,7 @@ export default function ZakatCalculator() {
     }
   }
 
+  /* ---------- HANDLE ZAKAT CALCULATION ------------- */
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault(); // this prevented the website reloading before even finishing
                         // calculating zakat, i dont even remember-
@@ -178,15 +186,18 @@ export default function ZakatCalculator() {
     <div className="p-4 min-h-screen text-center flex flex-col items-center justify-center overflow-x-hidden">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
-      <label className="text-[#888888] text-s md:w-2/5 m-3">
-        experienced devs, don't bully me and this wbesite please, im still learning lol
+      <label className="text-[#888888] text-s md:w-2/5 mb-5">
+        experienced devs, don't bully me or this wbesite please, im still learning lol
       </label>
       { practice_mode && (
-        <label className="text-[#888888] text-s md:w-2/5 m-3">
+        <label className="text-[#888888] text-s md:w-2/5 mb-5">
           test
         </label>
       )}
-      <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
+
+      {/* ------------ ZAKAT CALCULATOR --------------- */}
+      <>
+      <div className="mb-5 p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
         
         {/* ----------- TITLE OF THE PAGE ---------- */}
         <h1 className="text-2xl md:text-3xl font-black text-emerald-400 tracking-tight mb-2">
@@ -291,13 +302,11 @@ export default function ZakatCalculator() {
           { loading ? "Wait..." : (calculating ? "Fetching live data..." : "Calculate Zakat") }
         </button>
       </div>
-      
 
       {/*-------- RESULTS !!! ---------*/}
-
       { results && (
         <div
-        className="p-5 mt-6 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]" 
+        className={`${premium_div_2} mb-5`}
         style={{
           backgroundColor: `${results.colorCode}a0`, 
           borderColor: `${results.colorCode}bb`
@@ -322,10 +331,24 @@ export default function ZakatCalculator() {
 
       {/* ------------- USER'S HONEST OPINION ---------------- */}
       {!feedbackSent ? (
-        <div className={`${premium_div} bg-[#121212] border-[#232323]`}>
-          <h2 className="font-medium mb-5 text-xl text-emerald-300">
-            What is your honest opinion about this website?
+        <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
+          <h2 className="font-medium mb-5 text-2xl text-emerald-300">
+            Your honest opinion
           </h2>
+          <label className="mb-5">
+            What do you think I should add, remove, or change in this website?
+          </label>
+          <input
+            className={`${premium_style} mb-5`}
+            placeholder="(optional) Any suggestions... ?"
+            type='text'
+            id="user_suggestion"
+            value={suggestion}
+            onChange={(e) => setSuggestion(e.target.value)}
+          />
+          <label className="mb-5">
+            What is your honest opinion about this website?
+          </label>
           <input
             id="honest_opinion"
             type='text'
@@ -338,11 +361,11 @@ export default function ZakatCalculator() {
             id="username"
             type='text'
             value={username}
-            placeholder="Your name..."
+            placeholder="(optional) Your name..."
             className={`m-3 ${premium_style}`}
             onChange={(e) => setUsername(e.target.value)}
           />
-          <label className="text-s text-[#bbbbbb]">
+          <label className="text-s text-[#bbbbbb] mb-3">
             if you DON'T want to share your name, just leave the field empty
           </label>
           <button
@@ -366,13 +389,14 @@ export default function ZakatCalculator() {
           )}
         </div>
       ) : (
-        <div className={`${premium_div} bg-[#121212] border-[#232323] text-center`}>
+        <div className={`${premium_div_2} bg-[#121212] border-[#232323] text-center`}>
           <h2 className="font-medium text-xl text-emerald-400">
-            Thank you for your feedback! 🚀
+            Thank you for your feedback! :D
           </h2>
           <p className="text-sm text-neutral-400 mt-2">Your review was saved directly to the database.</p>
         </div>
       )}
+      </>
 
       { practice_mode && (
         <>
