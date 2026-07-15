@@ -230,14 +230,14 @@ export default function ZakatCalculator() {
           {/* -------------- CURRENCY INPUT ------------------- */}
           <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
-              Which currency do you use?
+              What is your local currency?
             </label>
             <div className="w-full md:w-1/2 min-w-0">
               <input
                 className={`${premium_style}`}
                 list="countries_list"
                 disabled={loading}
-                placeholder={loading ? "Wait..." : "Enter your currency..."}
+                placeholder={loading ? "Wait..." : "Type your country or currency..."}
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
               />
@@ -315,13 +315,13 @@ export default function ZakatCalculator() {
           <h2 className="font-bold mb-2">Your Zakat Result</h2>
           { results.eligible ? (
             <div className="text-sm md:text-base">
-              <label>Your amount of money exceeds the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
+              <label>Your amount of money exceeds the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
               <br/><br/>
               <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
             </div>
           ) : (
             <div className="text-sm md:text-base">
-              <label>Your amount of money does NOT exceed the current nisab of {results.nisabThreshold} {results.currency} as of today</label>
+              <label>Your amount of money does NOT exceed the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
               <br/><br/>
               <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
             </div>

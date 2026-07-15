@@ -1,35 +1,60 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { adminDb } from "../../../../firebaseAdmin";
 
-export async function POST(request: NextRequest) {
-    /* this unpacks whatever is packed inside inputs in the main page */
-    const body = await request.json();
+const CHECK_INTERVAL = 12; // hours
 
-    /* this extracts whatever we wanna extract */
-    const { name, opinion } = body; // "name" and "opinion" are declared in the main page
+export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
+  const apiKey = process.env.METAL_PRICE_API_KEY;
+  const { searchParams } = request.nextUrl;
+  const currency = searchParams.get("currency") || "USD";
+
+  const cacheRef = adminDb.collection("cached_rates_test").doc(currency);
+
+  try {
+    const cacheSnap = await cacheRef.get();
     
-    // it took me a couple of lines to realize we're remaking the feedback route
-    // this is the "bouncer", gemini says
-    if (!opinion || opinion.trim() === "") {
-        return NextResponse.json(
-            { message: "You can't send an empty opinion, though idk how you even got here, i made sure to stop sending empty submission in the front end" },
-            { status: 400 } // 400 means user error apparently
-        );
+    if (cacheSnap.exists) {
+      const cachedData = cacheSnap.data();
+      
+      if (cachedData && cachedData.cachedAt) {
+        const now = Date.now();
+        const CHECK_INTERVAL_ms = CHECK_INTERVAL * 3600 * 1000;
+        const cacheAge = now - cachedData.cachedAt;
+
+        if (cacheAge < CHECK_INTERVAL_ms) {
+          return NextResponse.json(cachedData.apiData);
+        }
+      }
     }
-    
-    const current_time_ms = Date.now().toString();
-    const feedbackRef = adminDb.collection("feedbacks_test").doc(current_time_ms);
-    
-    await feedbackRef.set({
-        createdAt: current_time_ms,
-        submittedAt: new Date().toLocaleString(), 
-        user_name: (name && name.trim() !== "") ? name : "Anonymous", 
-        user_opinion: opinion
-    })
-    
-    // if we reach here, that means the submission went successfully
+  } catch (err) {
+    console.log("sum happened in the first try (caching):", err)
+  }
+
+  try {
+    const CURRENCY_URL = `https://api.metalpriceapi.com/v1/latest?api_key=${apiKey}&currencies=${currency},XAU`;
+    const response = await fetch(CURRENCY_URL);
+
+    if (!response.ok) {
+      throw new Error("sum happened with api fetching idk");
+    }
+
+    const data = await response.json();
+
+    await cacheRef.set({
+      apiData: data,
+      cachedAt: Date.now()
+    });
+
+    return NextResponse.json(data);
+  
+  } catch (err) {
+
+    console.log("sum happened in the firebase, idk tho:", err);
     return NextResponse.json(
-        { message: "Message received, thank you for your feedback" },
-        { status: 200 } // 200 = yay
+      {message: "sum happened in firebase idk"},
+      {status: 500}
     );
+  }
 }
