@@ -17,9 +17,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const current_time = Date.now().toString();
+
     // 2. Reference the "feedback" collection in Firestore
     // Calling .doc() with no arguments tells Firestore to auto-generate a unique ID for this feedback
-    const feedbackRef = adminDb.collection("feedback").doc();
+    const feedbackRef = adminDb.collection("feedback").doc(current_time);
 
     // 3. Save the feedback securely
     // This bypasses all public write restrictions!
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
       userName: name ? name.trim() : "Anonymous", // Defaults to Anonymous if they left it blank
       userOpinion: opinion.trim(),
       createdAt: Date.now(), // Numeric timestamp (great for sorting later)
-      submittedAt: new Date().toLocaleString() // Readable date/time string
+      submittedAt: current_time // Readable date/time string
     });
 
     // 4. Return success response to the client

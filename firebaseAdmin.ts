@@ -1,18 +1,22 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 
-// We pack your secrets into an object and use "as string" 
-// so TypeScript knows for sure they aren't empty.
-const serviceAccount = {
-  projectId: process.env.FIREBASE_PROJECT_ID as string,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL as string,
-  privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n') as string,
-};
+// Safely format the private key, ensuring it handles Vercel's environment variables cleanly
+const privateKey = process.env.FIREBASE_PRIVATE_KEY 
+  ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') 
+  : undefined;
 
-// Check if a connection already exists, if not, create one!
-if (!getApps().length) {
+const projectId = process.env.FIREBASE_PROJECT_ID;
+const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+
+// Only initialize if we are NOT building or if the keys actually exist!
+if (!getApps().length && projectId && clientEmail && privateKey) {
   initializeApp({
-    credential: cert(serviceAccount),
+    credential: cert({
+      projectId,
+      clientEmail,
+      privateKey,
+    }),
   });
 }
 

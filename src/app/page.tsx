@@ -174,7 +174,9 @@ export default function ZakatCalculator() {
     <div className="p-4 min-h-screen text-center flex flex-col items-center justify-center overflow-x-hidden">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
-      <label className="text-[#888888] text-s w-2/5 m-3">experienced devs, don't bully me and this wbesite please, im still learning lol</label>
+      <label className="text-[#888888] text-s md:w-2/5 m-3">
+        experienced devs, don't bully me and this wbesite please, im still learning lol
+      </label>
       <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
         
         {/* ----------- TITLE OF THE PAGE ---------- */}
