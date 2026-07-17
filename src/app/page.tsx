@@ -9,6 +9,9 @@ const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 const premium_div = "box-border p-5 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]";
 const premium_div_2 = "p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center";
+const premium_dropdown = "overflow-y-auto max-h-60 list-none text-left bg-[#2a2a2a] p-3 text-white border border-emerald-500 rounded-lg";
+const premium_dropdown_option = "transition-all hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full";
+
 /* i dont wanna remove the first premium_div because sometimes one of them works very well
  and the other doesnt and sometimes the opposite */
 const premium_button = "p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all";
@@ -42,21 +45,26 @@ export default function ZakatCalculator() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [sending, setSending] = useState(false);
 
-  // ----------- MAKING A FAKE DROP DOWN MENU TO STYLE LATER --------------
+  // ----------- MAKING A FAKE DROP DOWN MENUs --------------
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [nisabOpen, setNisabOpen] = useState(false);
 
   // 1. create a gps tracker (?????)
   // useref basically is used to associate javascript variable with an html element
   // "Hey, this tracker is specifically designed to be attached to a <div>, 
   // and right now, before the screen loads, it is attached to null (nothing)."
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const NisabDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+      }
+      if (NisabDropdownRef.current && !NisabDropdownRef.current.contains(event.target as Node)) {
+        setNisabOpen(false);
       }
     };
 
@@ -69,6 +77,11 @@ export default function ZakatCalculator() {
     };
 
   }, []);
+
+  const nisabValues = [
+    { value: "85.00", nisabStr: "85.00g of pure gold" },
+    { value: "87.48", nisabStr: "87.48g of pure gold" }
+  ];
 
   const filteredCountries = countries.filter((country: any) => {
     if (!country.currencies || country.name === "Western Sahara") return false;
@@ -283,14 +296,14 @@ export default function ZakatCalculator() {
               />
 
               {isOpen && filteredCountries.length > 0 && (
-                <ul className="overflow-y-auto max-h-60 list-none text-left absolute z-50 bg-[#2a2a2a] p-3 text-white border border-emerald-500 rounded-lg">
+                <ul className={`w-full box-border absolute z-50 ${premium_dropdown}`}>
                   {filteredCountries.map((country: any) => {
                     const countryString = `${country.name} - ${country.currencies[0].code}`;
 
                     return (
                       <li 
                         key={countryString}
-                        className={`hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full`}
+                        className={`${premium_dropdown_option}`}
                         onClick={() => {
                           setSearchTerm(countryString);
                           setCountry(countryString);
@@ -326,17 +339,45 @@ export default function ZakatCalculator() {
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
               What nisab weight value do you use?
             </label>
-            <div className="w-full md:w-1/2 min-w-0">
-              <select
-                className={`${premium_style}`}
-                disabled={loading}
-                value={nisab}
-                onChange={(e) => setNisab(e.target.value)}
+            <div 
+                className="relative w-full md:w-1/2 md:text-left"
+                ref={NisabDropdownRef}
               >
-                <option value="87.48">87.48g of pure gold (Hanafi)</option>
-                <option value="85.00">85.00g of pure gold (Maliki, Shafi'i, Hanbali)</option>
-              </select>
-            </div>
+                <button
+                  className={`${premium_style} text-left`}
+                  onClick={() => {
+                    setNisabOpen(!nisabOpen);
+                  }}
+                >
+                  { nisab === "85.00" ?
+                    "85.00g of pure gold (Maliki, Shafi'i, Hanbali)"
+                  : "87.48g of pure gold (Hanafi)" }
+                </button>
+
+                { nisabOpen && (
+                  <ul
+                    className={`box-border w-full absolute z-50 ${premium_dropdown}`}
+                  >
+                    {
+                      nisabValues.map((nisabValue: any) => {
+                        return (
+                          <li
+                            key={nisabValue.nisabStr}
+                            className={`${premium_dropdown_option}`}
+                            onClick={() => {
+                              setNisabOpen(false);
+                              setNisab(nisabValue.value);
+                            }}
+                          >
+                            {nisabValue.nisabStr}
+                          </li>
+                        )
+                      })
+                    }
+                  </ul>
+                ) }
+
+              </div>
           </div>
         </div>
         
@@ -508,7 +549,7 @@ export default function ZakatCalculator() {
                 </div>
             </div>
             {/* row 2 */}
-            <div className="flex flex-col items-center md:flex-row w-full">
+            <div className="mb-3 flex flex-col items-center md:flex-row w-full">
               <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
                 <label>
                   your total money?
@@ -518,6 +559,20 @@ export default function ZakatCalculator() {
                 <input
                   className={`${premium_style}`}
                   placeholder="total..."
+                />
+              </div>
+            </div>
+            {/* row 3 */}
+            <div className="flex flex-col items-center md:flex-row w-full">
+              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                <label>
+                  Nisab?
+                </label>
+              </div>
+              <div className="w-full md:w-1/2 md:text-left">
+                <input
+                  className={`${premium_style}`}
+                  placeholder="nisab..."
                 />
               </div>
             </div>
