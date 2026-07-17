@@ -45,6 +45,8 @@ export default function ZakatCalculator() {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [sending, setSending] = useState(false);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   // ----------- MAKING A FAKE DROP DOWN MENUs --------------
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -237,290 +239,369 @@ export default function ZakatCalculator() {
     <div className="p-4 min-h-screen text-center flex flex-col items-center justify-center overflow-x-hidden">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
       
-      <label className="text-[#888888] text-s md:w-2/5 mb-5">
-        experienced devs, don't bully me or this wbesite please, im still learning lol
-      </label>
-      { practice_mode && (
-        <label className="text-[#888888] text-s md:w-2/5 mb-5">
-          test
+      <nav
+        className="fixed z-50 top-0 left-0 bg-emerald-500 w-full text-left pl-10 shadow-lg shadow-emerald-700"
+      >
+        <h3 className="text-2xl">
+          <span className="mr-4 cursor-pointer bg-emerald-600 p-2 rounded-md hover:text-[#0033ff]" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</span> Zakat Calculator
+        </h3>
+      </nav>
+
+      <aside 
+        className={`fixed pt-20 top-0 left-0 h-screen w-64 bg-[#1a1a1a] border-r border-neutral-800 p-5 z-40 transition-transform duration-300
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <h2>
+          Menu
+        </h2>
+        <ul className="text-left">
+          <li>
+            About...
+            <ul>
+              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">Zakat Calculation</li>
+              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">Developper (me :D)</li>
+            </ul>
+          </li>
+          <li>
+            Socials
+            <ul>
+              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">LinkedIn</li>
+              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">... i dont have anything else other than private socials...</li>
+            </ul>
+          </li>
+        </ul>
+
+        <br/><br/>
+        <label className="text-white/60">
+          the sidebar's still a work in progress so nothing here works in terms of logic yet
         </label>
-      )}
-
-      {/* ------------ ZAKAT CALCULATOR --------------- */}
-      <>
-      <div className="mb-5 p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
-        
-        {/* ----------- TITLE OF THE PAGE ---------- */}
-        <h1 className="text-2xl md:text-3xl font-black text-emerald-400 tracking-tight mb-2">
-          Zakat Calculator</h1>
-        
-        {loading ? (
-          <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries...</p>
-        ) : (
-          <div className="h-4" />
-        )}
-
-        {/* ----------- ERROR MESSAGES ------------- */}
-        {countryError && (
-          <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
-            You forgot to fill in the country field properly!<br/>
-            <span className="text-neutral-400 font-normal">
-              Example: instead of writing just "Morocco" or just "MAD", select "Morocco - MAD".</span>
-          </div>
-        )}
-        
-        {amountError && (
-          <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
-            You forgot to fill in the total amount field!
-          </div>
-        )}
-
-        {/* ----------- QUESTIONS AND INPUTS -------------- */}
-        <div className="w-full flex flex-col gap-6 mt-2">
-          
-          {/* -------------- CURRENCY INPUT ------------------- */}
-          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
-              What is your local currency?
-            </label>
-            <div ref={dropdownRef} className="relative w-full md:w-1/2 md:text-left md:mb-0">
-              <input
-                className={`${premium_style}`}
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setIsOpen(true);
-                }}
-                onFocus={() => setIsOpen(true)}
-                placeholder="type your country or your currency..."
-              />
-
-              {isOpen && filteredCountries.length > 0 && (
-                <ul className={`w-full box-border absolute z-50 ${premium_dropdown}`}>
-                  {filteredCountries.map((country: any) => {
-                    const countryString = `${country.name} - ${country.currencies[0].code}`;
-
-                    return (
-                      <li 
-                        key={countryString}
-                        className={`${premium_dropdown_option}`}
-                        onClick={() => {
-                          setSearchTerm(countryString);
-                          setCountry(countryString);
-                          setIsOpen(false);
-                        }}
-                      >
-                        {countryString}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </div>
-          
-          {/* ------------ AMOUNT INPUT -------------- */}
-          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
-              Total money / wealth?
-            </label>
-            <div className="w-full md:w-1/2 min-w-0">
-              <input
-                className={`${premium_style} ${remove_arrow_spinners}`}
-                type='number'
-                disabled={loading}
-                placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
-                value={amount} onChange={(e) => setAmount(e.target.value)}/>
-            </div>
-          </div>
-          
-          {/* -------------- NISAB INPUT ------------- */}
-          <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
-            <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
-              What nisab weight value do you use?
-            </label>
-            <div 
-                className="relative w-full md:w-1/2 md:text-left"
-                ref={NisabDropdownRef}
-              >
-                <button
-                  className={`${premium_style} text-left`}
-                  onClick={() => {
-                    setNisabOpen(!nisabOpen);
-                  }}
-                >
-                  { nisab === "85.00" ?
-                    "85.00g of pure gold (Maliki, Shafi'i, Hanbali)"
-                  : "87.48g of pure gold (Hanafi)" }
-                </button>
-
-                { nisabOpen && (
-                  <ul
-                    className={`box-border w-full absolute z-50 ${premium_dropdown}`}
-                  >
-                    {
-                      nisabValues.map((nisabValue: any) => {
-                        return (
-                          <li
-                            key={nisabValue.nisabStr}
-                            className={`${premium_dropdown_option}`}
-                            onClick={() => {
-                              setNisabOpen(false);
-                              setNisab(nisabValue.value);
-                            }}
-                          >
-                            {nisabValue.nisabStr}
-                          </li>
-                        )
-                      })
-                    }
-                  </ul>
-                ) }
-
-              </div>
-          </div>
-        </div>
-        
-        {/* --------- CALCULATE BUTTON ------------ */}
-        <button 
-          onClick={handleCalculate}
-          disabled={calculating || loading}
-          className={`mt-8 p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all ${
-            calculating || loading
-              ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
-              : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
-          }`}
-        >
-          { loading ? "Wait..." : (calculating ? "Fetching live data..." : "Calculate Zakat") }
-        </button>
-      </div>
-
-      {/*-------- RESULTS !!! ---------*/}
-      { results && (
+      </aside>
+      
+      { sidebarOpen && (
         <div
-        className={`${premium_div_2} mb-5`}
-        style={{
-          backgroundColor: `${results.colorCode}a0`, 
-          borderColor: `${results.colorCode}bb`
-        }}
-        >
-          <h2 className="font-bold mb-2">Your Zakat Result</h2>
-          { results.eligible ? (
-            <div className="text-sm md:text-base">
-              <label>Your amount of money exceeds the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/><br/>
-              <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
-            </div>
-          ) : (
-            <div className="text-sm md:text-base">
-              <label>Your amount of money does NOT exceed the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
-              <br/><br/>
-              <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
-            </div>
-          ) }
-        </div>
+          className={`fixed inset-0 bg-black/60 z-30 transition-all`}
+          onClick={() => setSidebarOpen(false)}
+        />
       ) }
 
-      {/* ------------- USER'S HONEST OPINION ---------------- */}
-      {!feedbackSent ? (
-        <div className="p-5 mb-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
-          <h2 className="font-medium mb-5 text-2xl text-emerald-300">
-            Your honest opinion
-          </h2>
-          <label className="mb-5">
-            What do you think I should add, remove, or change in this website?
+      <main className={`pt-20 flex flex-col items-center`}>
+
+        <label className="text-[#888888] text-s md:w-2/5 mb-5">
+          experienced devs, don't bully me or this wbesite please, im still learning lol
+        </label>
+        { practice_mode && (
+          <label className="text-[#888888] text-s md:w-2/5 mb-5">
+            test
           </label>
-          {/* --------------- SUGGESTION INPUT ------------------- */}
-          <input
-            className={`${premium_style} mb-5`}
-            placeholder="(optional) Any suggestions... ?"
-            type='text'
-            id="user_suggestion"
-            value={suggestion}
-            onChange={(e) => setSuggestion(e.target.value)}
-            />
-          {/* --------------- HONEST OPINION INPUT ---------------- */}
-          <label className="mb-5">
-            What is your honest opinion about this website?
-          </label>
-          <input
-            id="honest_opinion"
-            type='text'
-            value={opinion}
-            placeholder="Your honest opinion..."
-            className={`${premium_style}`}
-            onChange={(e) => setOpinion(e.target.value)}
-            />
-          {/* --------------- USER NAME INPUT ---------------- */}
-          <input
-            id="username"
-            type='text'
-            value={username}
-            placeholder="(optional) Your name..."
-            className={`m-3 ${premium_style}`}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <label className="text-s text-[#bbbbbb] mb-3">
-            if you DON'T want to share your name, just leave the field empty
-          </label>
-          <button
-            className={`${premium_button} ${
-              (opinion === "" || sending) ? "cursor-not-allowed" : "cursor-pointer"
-            } ${
-              (opinion === "" || sending)
+        )}
+
+        {/* ------------ ZAKAT CALCULATOR --------------- */}
+        <>
+        <div className="mb-5 p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
+          
+          {/* ----------- TITLE OF THE PAGE ---------- */}
+          <h1 className="text-2xl md:text-3xl font-black text-emerald-400 tracking-tight mb-2">
+            Zakat Calculator</h1>
+          
+          {loading ? (
+            <p className="text-neutral-500 text-xs animate-pulse mb-4">Fetching countries...</p>
+          ) : (
+            <div className="h-4" />
+          )}
+
+          {/* ----------- ERROR MESSAGES ------------- */}
+          {countryError && (
+            <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
+              You forgot to fill in the country field properly!<br/>
+              <span className="text-neutral-400 font-normal">
+                Example: instead of writing just "Morocco" or just "MAD", select "Morocco - MAD".</span>
+            </div>
+          )}
+          
+          {amountError && (
+            <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-10 text-xs font-semibold mb-4 text-left w-full">
+              You forgot to fill in the total amount field!
+            </div>
+          )}
+
+          {/* ----------- QUESTIONS AND INPUTS -------------- */}
+          <div className="w-full flex flex-col gap-6 mt-2">
+            
+            {/* -------------- CURRENCY INPUT ------------------- */}
+            <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+              <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+                What is your local currency?
+              </label>
+              <div ref={dropdownRef} className="relative w-full md:w-1/2 md:text-left md:mb-0">
+                <input
+                  className={`${premium_style}`}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsOpen(true);
+                  }}
+                  onFocus={() => setIsOpen(true)}
+                  placeholder="type your country or your currency..."
+                />
+
+                {isOpen && filteredCountries.length > 0 && (
+                  <ul className={`w-full box-border absolute z-30 ${premium_dropdown}`}>
+                    {filteredCountries.map((country: any) => {
+                      const countryString = `${country.name} - ${country.currencies[0].code}`;
+
+                      return (
+                        <li 
+                          key={countryString}
+                          className={`${premium_dropdown_option}`}
+                          onClick={() => {
+                            setSearchTerm(countryString);
+                            setCountry(countryString);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {countryString}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+            
+            {/* ------------ AMOUNT INPUT -------------- */}
+            <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+              <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+                Total money / wealth?
+              </label>
+              <div className="w-full md:w-1/2 min-w-0">
+                <input
+                  className={`${premium_style} ${remove_arrow_spinners}`}
+                  type='number'
+                  disabled={loading}
+                  placeholder={loading ? "Wait..." : "Enter your TOTAL..."}
+                  value={amount} onChange={(e) => setAmount(e.target.value)}/>
+              </div>
+            </div>
+            
+            {/* -------------- NISAB INPUT ------------- */}
+            <div className="flex flex-col md:flex-row md:items-center w-full min-w-0">
+              <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
+                What nisab weight value do you use?
+              </label>
+              <div 
+                  className="relative w-full md:w-1/2 md:text-left"
+                  ref={NisabDropdownRef}
+                >
+                  <button
+                    className={`${premium_style} text-left cursor-pointer`}
+                    onClick={() => {
+                      setNisabOpen(!nisabOpen);
+                    }}
+                  >
+                    { nisab === "85.00" ?
+                      "85.00g of pure gold (Maliki, Shafi'i, Hanbali)"
+                    : "87.48g of pure gold (Hanafi)" }
+                  </button>
+
+                  { nisabOpen && (
+                    <ul
+                      className={`box-border w-full absolute z-30 ${premium_dropdown}`}
+                    >
+                      {
+                        nisabValues.map((nisabValue: any) => {
+                          return (
+                            <li
+                              key={nisabValue.nisabStr}
+                              className={`${premium_dropdown_option}`}
+                              onClick={() => {
+                                setNisabOpen(false);
+                                setNisab(nisabValue.value);
+                              }}
+                            >
+                              {nisabValue.nisabStr}
+                            </li>
+                          )
+                        })
+                      }
+                    </ul>
+                  ) }
+
+                </div>
+            </div>
+          </div>
+          
+          {/* --------- CALCULATE BUTTON ------------ */}
+          <button 
+            onClick={handleCalculate}
+            disabled={calculating || loading}
+            className={`mt-8 p-3 w-full md:w-auto md:px-12 rounded-lg font-bold transition-all ${
+              calculating || loading
                 ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
                 : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
             }`}
-            onClick={sendOpinion}
-            disabled={opinion === "" || sending}
           >
-            {sending ? "Submitting..." : "Submit"}
+            { loading ? "Wait..." : (calculating ? "Fetching live data..." : "Calculate Zakat") }
           </button>
-          {submitError && (
-            <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-5 m-5 text-xs font-semibold mb-4 text-left w-full">
-              Error: something unexpected happened submitting this message :(<br/>
-              Try again later...
-            </div>
-          )}
         </div>
-      ) : (
-        <div className={`${premium_div_2} mb-5 bg-[#121212] border-[#232323] text-center`}>
-          <h2 className="font-medium text-xl text-emerald-400">
-            Thank you for your feedback! :D
-          </h2>
-          <p className="text-sm text-neutral-400 mt-2">Your review was saved directly to the database.</p>
-        </div>
-      )}
-      </>
-      
-      {/* ============== PRACTICE MODE ================= */}
-      { practice_mode && (
-        <>
-          <div className={`${premium_div_2}`}>
-            
-            {/* GEMINI'S WAY */}
-            <div className="text-[#343434] mb-5">gemini's way</div>
-            <div className="flex flex-col gap-3 w-full">
+
+        {/*-------- RESULTS !!! ---------*/}
+        { results && (
+          <div
+          className={`${premium_div_2} shadow-${results.colorCode} mb-5`}
+          style={{
+            backgroundColor: `${results.colorCode}a0`, 
+            borderColor: `${results.colorCode}bb`
+          }}
+          >
+            <h2 className="font-bold mb-2">Your Zakat Result</h2>
+            { results.eligible ? (
+              <div className="text-sm md:text-base">
+                <label>Your amount of money exceeds the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
+                <br/><br/>
+                <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
+              </div>
+            ) : (
+              <div className="text-sm md:text-base">
+                <label>Your amount of money does NOT exceed the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
+                <br/><br/>
+                <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
+              </div>
+            ) }
+          </div>
+        ) }
+
+        {/* ------------- USER'S HONEST OPINION ---------------- */}
+        {!feedbackSent ? (
+          <div className="p-5 mb-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
+            <h2 className="font-medium mb-5 text-2xl text-emerald-300">
+              Your honest opinion
+            </h2>
+            <label className="mb-5">
+              What do you think I should add, remove, or change in this website?
+            </label>
+            {/* --------------- SUGGESTION INPUT ------------------- */}
+            <input
+              className={`${premium_style} mb-5`}
+              placeholder="(optional) Any suggestions... ?"
+              type='text'
+              id="user_suggestion"
+              value={suggestion}
+              onChange={(e) => setSuggestion(e.target.value)}
+              />
+            {/* --------------- HONEST OPINION INPUT ---------------- */}
+            <label className="mb-5">
+              What is your honest opinion about this website?
+            </label>
+            <input
+              id="honest_opinion"
+              type='text'
+              value={opinion}
+              placeholder="Your honest opinion..."
+              className={`${premium_style}`}
+              onChange={(e) => setOpinion(e.target.value)}
+              />
+            {/* --------------- USER NAME INPUT ---------------- */}
+            <input
+              id="username"
+              type='text'
+              value={username}
+              placeholder="(optional) Your name..."
+              className={`m-3 ${premium_style}`}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <label className="text-s text-[#bbbbbb] mb-3">
+              if you DON'T want to share your name, just leave the field empty
+            </label>
+            <button
+              className={`${premium_button} ${
+                (opinion === "" || sending) ? "cursor-not-allowed" : "cursor-pointer"
+              } ${
+                (opinion === "" || sending)
+                  ? "bg-neutral-600 text-neutral-300 cursor-not-allowed" 
+                  : "bg-emerald-600 text-white hover:bg-emerald-500 active:scale-95"
+              }`}
+              onClick={sendOpinion}
+              disabled={opinion === "" || sending}
+            >
+              {sending ? "Submitting..." : "Submit"}
+            </button>
+            {submitError && (
+              <div className="box-border text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg p-5 m-5 text-xs font-semibold mb-4 text-left w-full">
+                Error: something unexpected happened submitting this message :(<br/>
+                Try again later...
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={`${premium_div_2} mb-5 bg-[#121212] border-[#232323] text-center`}>
+            <h2 className="font-medium text-xl text-emerald-400">
+              Thank you for your feedback! :D
+            </h2>
+            <p className="text-sm text-neutral-400 mt-2">Your review was saved directly to the database.</p>
+          </div>
+        )}
+        </>
+        
+        {/* ============== PRACTICE MODE ================= */}
+        { practice_mode && (
+          <>
+            <div className={`${premium_div_2}`}>
+              
+              {/* GEMINI'S WAY */}
+              <div className="text-[#343434] mb-5">gemini's way</div>
+              <div className="flex flex-col gap-3 w-full">
+                {/* row 1 */}
+                <div className="flex flex-col items-center md:flex-row w-full">
+                  <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                    <label>
+                      what is your local currency?
+                    </label>
+                  </div>
+                  <div className="w-full md:w-1/2 md:text-left">
+                    <input
+                      className={`${premium_style}`}
+                      placeholder="type your country or your currency..."
+                    />  
+                  </div>
+                </div>
+
+                {/* row 2 */}
+                <div className="flex flex-col items-center md:flex-row w-full">
+                  <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                    <label>
+                      total money?
+                    </label>
+                  </div>
+                  <div className="w-full md:w-1/2 md:text-left">
+                    <input
+                      className={`${premium_style}`}
+                      placeholder="total..."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* MY WAY */}
+              <div className="text-[#343434] mb-5 mt-5 md:max-w-3/5">my way (manually adding mb-3 on each div (except for the last one))</div>
               {/* row 1 */}
-              <div className="flex flex-col items-center md:flex-row w-full">
+              <div className="mb-3 flex flex-col items-center md:flex-row w-full">
                 <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
                   <label>
                     what is your local currency?
                   </label>
                 </div>
-                <div className="w-full md:w-1/2 md:text-left">
-                  <input
-                    className={`${premium_style}`}
-                    placeholder="type your country or your currency..."
-                  />  
-                </div>
+                  <div className="w-full md:w-1/2 md:text-left">
+                    <input
+                      className={`${premium_style}`}
+                      placeholder="type your country or your currency..."
+                    />  
+                  </div>
               </div>
-
               {/* row 2 */}
-              <div className="flex flex-col items-center md:flex-row w-full">
+              <div className="mb-3 flex flex-col items-center md:flex-row w-full">
                 <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
                   <label>
-                    total money?
+                    your total money?
                   </label>
                 </div>
                 <div className="w-full md:w-1/2 md:text-left">
@@ -530,55 +611,24 @@ export default function ZakatCalculator() {
                   />
                 </div>
               </div>
-            </div>
-
-            {/* MY WAY */}
-            <div className="text-[#343434] mb-5 mt-5 md:max-w-3/5">my way (manually adding mb-3 on each div (except for the last one))</div>
-            {/* row 1 */}
-            <div className="mb-3 flex flex-col items-center md:flex-row w-full">
-              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
-                <label>
-                  what is your local currency?
-                </label>
-              </div>
+              {/* row 3 */}
+              <div className="flex flex-col items-center md:flex-row w-full">
+                <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                  <label>
+                    Nisab?
+                  </label>
+                </div>
                 <div className="w-full md:w-1/2 md:text-left">
                   <input
                     className={`${premium_style}`}
-                    placeholder="type your country or your currency..."
-                  />  
+                    placeholder="nisab..."
+                  />
                 </div>
-            </div>
-            {/* row 2 */}
-            <div className="mb-3 flex flex-col items-center md:flex-row w-full">
-              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
-                <label>
-                  your total money?
-                </label>
-              </div>
-              <div className="w-full md:w-1/2 md:text-left">
-                <input
-                  className={`${premium_style}`}
-                  placeholder="total..."
-                />
               </div>
             </div>
-            {/* row 3 */}
-            <div className="flex flex-col items-center md:flex-row w-full">
-              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
-                <label>
-                  Nisab?
-                </label>
-              </div>
-              <div className="w-full md:w-1/2 md:text-left">
-                <input
-                  className={`${premium_style}`}
-                  placeholder="nisab..."
-                />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </main>
     </div>
   )
 }
