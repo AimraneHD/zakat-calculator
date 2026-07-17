@@ -1,5 +1,6 @@
 "use client";
 
+import { doc } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
 
 // apparently this abomination of a gibberish removes the spinners...
@@ -46,6 +47,14 @@ export default function ZakatCalculator() {
   const [sending, setSending] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = (sidebarOpen ? "hidden" : "unset");
+
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [sidebarOpen]);
 
   // ----------- MAKING A FAKE DROP DOWN MENUs --------------
   const [searchTerm, setSearchTerm] = useState("");
@@ -265,7 +274,16 @@ export default function ZakatCalculator() {
           <li>
             Socials
             <ul>
-              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">LinkedIn</li>
+              <li>
+                <a 
+                  href="https://www.linkedin.com/in/aimrane-haddou/"
+                  target='_blank'
+                  rel="noopener noreferrer"
+                  className="block w-full text-white no-underline hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors"
+                >
+                  LinkedIn
+                </a>
+              </li>
               <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">... i dont have anything else other than private socials...</li>
             </ul>
           </li>
@@ -273,7 +291,8 @@ export default function ZakatCalculator() {
 
         <br/><br/>
         <label className="text-white/60">
-          the sidebar's still a work in progress so nothing here works in terms of logic yet
+          the sidebar's still a work in progress so nothing here works in terms of logic yet<br/>
+          ...except for the linkedin button, that does take you to my linkedin profile :D
         </label>
       </aside>
       
