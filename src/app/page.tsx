@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
@@ -41,6 +41,44 @@ export default function ZakatCalculator() {
   const [submitError, setSubmitError] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [sending, setSending] = useState(false);
+
+  // ----------- MAKING A FAKE DROP DOWN MENU TO STYLE LATER --------------
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+
+  // 1. create a gps tracker (?????)
+  // useref basically is used to associate javascript variable with an html element
+  // "Hey, this tracker is specifically designed to be attached to a <div>, 
+  // and right now, before the screen loads, it is attached to null (nothing)."
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    // this tells the browser to "start listening!"
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      // this tells the browser to "stop listening!"
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+
+  }, []);
+
+  const filteredCountries = countries.filter((country: any) => {
+    if (!country.currencies || country.name === "Western Sahara") return false;
+
+    const searchLower = searchTerm.toLowerCase();
+    const nameLower = country.name.toLowerCase();
+    const codeLower = country.currencies[0].code.toLowerCase();
+
+    return nameLower.includes(searchLower) || codeLower.includes(searchLower);
+  });
 
   /* --------------- HANDLE OPINION SUBMISSION --------------- */
   const sendOpinion = async (e: React.FormEvent) => {
@@ -232,26 +270,38 @@ export default function ZakatCalculator() {
             <label className="mb-2 md:mb-0 md:w-1/2 md:pr-4 text-center md:text-right font-medium">
               What is your local currency?
             </label>
-            <div className="w-full md:w-1/2 min-w-0">
+            <div ref={dropdownRef} className="relative w-full md:w-1/2 md:text-left md:mb-0">
               <input
                 className={`${premium_style}`}
-                list="countries_list"
-                disabled={loading}
-                placeholder={loading ? "Wait..." : "Type your country or currency..."}
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setIsOpen(true);
+                }}
+                onFocus={() => setIsOpen(true)}
+                placeholder="type your country or your currency..."
               />
-              <datalist id="countries_list">
-                {countries.filter((country: any) => country.currencies && country.name !== "Western Sahara" )
-                .map((country: any) => {
-                  const countryString = `${country.name} - ${country.currencies[0].code}`;
-                  return (
-                    <option key={country.name} value={countryString}>
-                      {countryString}
-                    </option>
-                  );
-                })}
-              </datalist>
+
+              {isOpen && filteredCountries.length > 0 && (
+                <ul className="overflow-y-auto max-h-60 list-none text-left absolute z-50 bg-[#2a2a2a] p-3 text-white border border-emerald-500 rounded-lg">
+                  {filteredCountries.map((country: any) => {
+                    const countryString = `${country.name} - ${country.currencies[0].code}`;
+
+                    return (
+                      <li 
+                        className={`hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full`}
+                        onClick={() => {
+                          setSearchTerm(countryString);
+                          setCountry(countryString);
+                          setIsOpen(false);
+                        }}
+                      >
+                        {countryString}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </div>
           </div>
           
@@ -331,13 +381,14 @@ export default function ZakatCalculator() {
 
       {/* ------------- USER'S HONEST OPINION ---------------- */}
       {!feedbackSent ? (
-        <div className="p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
+        <div className="p-5 mb-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center">
           <h2 className="font-medium mb-5 text-2xl text-emerald-300">
             Your honest opinion
           </h2>
           <label className="mb-5">
             What do you think I should add, remove, or change in this website?
           </label>
+          {/* --------------- SUGGESTION INPUT ------------------- */}
           <input
             className={`${premium_style} mb-5`}
             placeholder="(optional) Any suggestions... ?"
@@ -345,7 +396,8 @@ export default function ZakatCalculator() {
             id="user_suggestion"
             value={suggestion}
             onChange={(e) => setSuggestion(e.target.value)}
-          />
+            />
+          {/* --------------- HONEST OPINION INPUT ---------------- */}
           <label className="mb-5">
             What is your honest opinion about this website?
           </label>
@@ -356,7 +408,8 @@ export default function ZakatCalculator() {
             placeholder="Your honest opinion..."
             className={`${premium_style}`}
             onChange={(e) => setOpinion(e.target.value)}
-          />
+            />
+          {/* --------------- USER NAME INPUT ---------------- */}
           <input
             id="username"
             type='text'
@@ -389,7 +442,7 @@ export default function ZakatCalculator() {
           )}
         </div>
       ) : (
-        <div className={`${premium_div_2} bg-[#121212] border-[#232323] text-center`}>
+        <div className={`${premium_div_2} mb-5 bg-[#121212] border-[#232323] text-center`}>
           <h2 className="font-medium text-xl text-emerald-400">
             Thank you for your feedback! :D
           </h2>
@@ -397,18 +450,105 @@ export default function ZakatCalculator() {
         </div>
       )}
       </>
-
+      
+      {/* ============== PRACTICE MODE ================= */}
       { practice_mode && (
         <>
-        {/* our practice bookshelf */}
-        <div className="p-5 mt-6 max-w-xl md:w-full border text-center flex flex-col md:flex-row items-center justify-center rounded-2xl bg-[#121212] border-[#232323]">
-          <div className="md:w-1/4">
-            <h1 className="text-[#23ea83] text-center">💡 Did you know?</h1>
+          <div className={`${premium_div_2}`}>
+            
+            {/* GEMINI'S WAY */}
+            <div className="text-[#343434] mb-5">gemini's way</div>
+            <div className="flex flex-col gap-3 w-full">
+              {/* row 1 */}
+              <div className="flex flex-col items-center md:flex-row w-full">
+                <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                  <label>
+                    what is your local currency?
+                  </label>
+                </div>
+                <div className="w-full md:w-1/2 md:text-left">
+                  <input
+                    className={`${premium_style}`}
+                    placeholder="type your country or your currency..."
+                  />
+                  
+                </div>
+              </div>
+
+              {/* row 2 */}
+              <div className="flex flex-col items-center md:flex-row w-full">
+                <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                  <label>
+                    total money?
+                  </label>
+                </div>
+                <div className="w-full md:w-1/2 md:text-left">
+                  <input
+                    className={`${premium_style}`}
+                    placeholder="total..."
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* MY WAY */}
+            <div className="text-[#343434] mb-5 mt-5 md:max-w-3/5">my way (manually adding mb-3 on each div (except for the last one))</div>
+            {/* row 1 */}
+            <div className="mb-3 flex flex-col items-center md:flex-row w-full">
+              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                <label>
+                  what is your local currency?
+                </label>
+              </div>
+              <div ref={dropdownRef} className="relative w-full md:w-1/2 md:text-left mb-3 md:mb-0">
+                <input
+                  className={`${premium_style}`}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setIsOpen(true);
+                  }}
+                  onFocus={() => setIsOpen(true)}
+                  placeholder="type your country or your currency..."
+                />
+
+                {isOpen && filteredCountries.length > 0 && (
+                  <ul className="overflow-y-auto max-h-60 list-none text-left absolute z-50 bg-[#2a2a2a] p-3 text-white border border-emerald-500 rounded-lg">
+                    {filteredCountries.map((country: any) => {
+                      const countryString = `${country.name} - ${country.currencies[0].code}`;
+
+                      return (
+                        <li 
+                          className={`hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full`}
+                          onClick={() => {
+                            setSearchTerm(countryString);
+                            setCountry(countryString);
+                            setIsOpen(false);
+                          }}
+                        >
+                          {countryString}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            </div>
+            {/* row 2 */}
+            <div className="flex flex-col items-center md:flex-row w-full">
+              <div className="md:w-1/2 md:pr-4 md:text-right mb-3 md:mb-0">
+                <label>
+                  your total money?
+                </label>
+              </div>
+              <div className="w-full md:w-1/2 md:text-left">
+                <input
+                  className={`${premium_style}`}
+                  placeholder="total..."
+                />
+              </div>
+            </div>
           </div>
-          <div className="md:max-w-3/4">
-            <span className="text-xl">{lorem_ipsum.slice(0, 100)}</span>
-          </div>
-        </div>
         </>
       )}
     </div>
