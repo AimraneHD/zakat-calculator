@@ -289,6 +289,7 @@ export default function ZakatCalculator() {
 
                     return (
                       <li 
+                        key={countryString}
                         className={`hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full`}
                         onClick={() => {
                           setSearchTerm(countryString);
@@ -470,8 +471,7 @@ export default function ZakatCalculator() {
                   <input
                     className={`${premium_style}`}
                     placeholder="type your country or your currency..."
-                  />
-                  
+                  />  
                 </div>
               </div>
 
@@ -500,39 +500,12 @@ export default function ZakatCalculator() {
                   what is your local currency?
                 </label>
               </div>
-              <div ref={dropdownRef} className="relative w-full md:w-1/2 md:text-left mb-3 md:mb-0">
-                <input
-                  className={`${premium_style}`}
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setIsOpen(true);
-                  }}
-                  onFocus={() => setIsOpen(true)}
-                  placeholder="type your country or your currency..."
-                />
-
-                {isOpen && filteredCountries.length > 0 && (
-                  <ul className="overflow-y-auto max-h-60 list-none text-left absolute z-50 bg-[#2a2a2a] p-3 text-white border border-emerald-500 rounded-lg">
-                    {filteredCountries.map((country: any) => {
-                      const countryString = `${country.name} - ${country.currencies[0].code}`;
-
-                      return (
-                        <li 
-                          className={`hover:bg-emerald-500 cursor-pointer pt-2 pb-2 rounded-sm w-full`}
-                          onClick={() => {
-                            setSearchTerm(countryString);
-                            setCountry(countryString);
-                            setIsOpen(false);
-                          }}
-                        >
-                          {countryString}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
+                <div className="w-full md:w-1/2 md:text-left">
+                  <input
+                    className={`${premium_style}`}
+                    placeholder="type your country or your currency..."
+                  />  
+                </div>
             </div>
             {/* row 2 */}
             <div className="flex flex-col items-center md:flex-row w-full">
