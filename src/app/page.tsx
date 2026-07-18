@@ -1,7 +1,7 @@
 "use client";
 
-import { doc } from "firebase/firestore";
 import { useEffect, useState, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
@@ -648,6 +648,7 @@ export default function ZakatCalculator() {
           </>
         )}
       </main>
+      <Analytics/>
     </div>
   )
 }
