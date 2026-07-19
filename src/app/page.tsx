@@ -8,12 +8,12 @@ import { Analytics } from "@vercel/analytics/react";
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
 
-const practice_mode = false;
+const practice_mode = true;
 
 // premium stylizing by GEMINI
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
 const premium_div = `box-border p-5 max-w-xl w-11/12 md:w-full border text-center flex flex-col items-center justify-center shadow-2xl transition-all duration-500 rounded-2xl backdrop-blur-md scale-100 animate-[fadeIn_0.2s_ease-out]`;
-const premium_div_2 = `p-5 md:p-8 bg-[#121212] rounded-2xl border ${ practice_mode ? "border-[#ff0000]" : "border-neutral-800" } shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center`;
+const premium_div_2 = `p-5 md:p-8 bg-[#121212] rounded-2xl border border-neutral-800 shadow-2xl max-w-xl w-11/12 md:w-full flex flex-col items-center`;
 
 /* i dont wanna remove the first premium_div because sometimes one of them works very well
  and the other doesnt and sometimes the opposite */
@@ -426,7 +426,7 @@ export default function ZakatCalculator() {
         
         {/* ============== PRACTICE MODE ================= */}
         { practice_mode && (
-          <>
+          <div className="box-border border border-[#ff0000] p-4">
             <div className={`${premium_div_2}`}>
               
               {/* GEMINI'S WAY */}
@@ -501,6 +501,7 @@ export default function ZakatCalculator() {
                   </label>
                 </div>
                 <div className="relative w-full md:w-1/2 md:text-left">
+                  
                   <button
                     className={`${premium_style} text-left`}
                     value={nisab}
@@ -508,10 +509,11 @@ export default function ZakatCalculator() {
                     {nisab === "85.00" ? "85.00g of pure gold"
                                        : "87.48g of pure gold"}
                   </button>
+
                 </div>
               </div>
             </div> 
-          </>
+          </div>
         )}
       </main>
       <Analytics/>
