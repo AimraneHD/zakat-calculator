@@ -6,4 +6,5 @@ body {
     font-family: Cascadia code;
     background-color: rgb(61, 63, 62);
     color: white;
+    overflow-x: hidden;
 }
