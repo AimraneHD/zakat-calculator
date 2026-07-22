@@ -8,7 +8,7 @@ import { Analytics } from "@vercel/analytics/react";
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
 
-const practice_mode = true;
+const practice_mode = false;
 
 // premium stylizing by GEMINI
 const premium_style = "box-border max-w-full min-w-0 w-full bg-[#2a2a2a] text-white p-2.5 px-4 rounded-lg border border-neutral-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all";
@@ -37,16 +37,6 @@ export default function ZakatCalculator() {
 
   const [calculating, setCalculating] = useState(false);
   const [results, setResults] = useState<any>(null);
-
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    document.body.style.overflow = (sidebarOpen ? "hidden" : "unset");
-
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [sidebarOpen]);
 
   // ----------- MAKING A FAKE DROP DOWN MENUs --------------
   const [searchTerm, setSearchTerm] = useState("");
@@ -204,63 +194,8 @@ export default function ZakatCalculator() {
   return (
     <div className="p-4 min-h-screen text-center flex flex-col items-center justify-center">
       <meta name="google-site-verification" content="hy8z4ThqyODSslQuKlkpX-d2q9H13HQJ6CZMehYGiD8" />
-      
-      <nav
-        className="fixed z-50 top-0 left-0 bg-emerald-500 w-full text-left pl-10 shadow-lg shadow-emerald-700"
-      >
-        <h3 className="text-2xl">
-          <span className="mr-4 cursor-pointer bg-emerald-600 p-2 rounded-md hover:text-[#0033ff]" onClick={() => setSidebarOpen(!sidebarOpen)}>☰</span> Zakat Calculator
-        </h3>
-      </nav>
 
-      <aside 
-        className={`fixed pt-20 top-0 left-0 h-screen w-64 bg-[#1a1a1a] border-r border-neutral-800 p-5 z-40 transition-transform duration-300
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
-      >
-        <h2>
-          Menu
-        </h2>
-        <ul className="text-left">
-          <li>
-            About...
-            <ul>
-              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">Zakat Calculation</li>
-              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">Developper (me :D)</li>
-            </ul>
-          </li>
-          <li>
-            Socials
-            <ul>
-              <li>
-                <a 
-                  href="https://www.linkedin.com/in/aimrane-haddou/"
-                  target='_blank'
-                  rel="noopener noreferrer"
-                  className="block w-full text-white no-underline hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors"
-                >
-                  LinkedIn
-                </a>
-              </li>
-              <li className="hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors">... i dont have anything else other than private socials...</li>
-            </ul>
-          </li>
-        </ul>
-
-        <br/><br/>
-        <label className="text-white/60">
-          the sidebar's still a work in progress so nothing here works in terms of logic yet<br/>
-          ...except for the linkedin button, that does take you to my linkedin profile :D
-        </label>
-      </aside>
-      
-      { sidebarOpen && (
-        <div
-          className={`fixed inset-0 bg-black/60 z-30 transition-all`}
-          onClick={() => setSidebarOpen(false)}
-        />
-      ) }
-
-      <main className={`pt-20 flex flex-col items-center`}>
+      <main className={`pt-30 flex flex-col items-center`}>
 
         <label className="text-[#888888] text-s md:w-2/5 mb-5">
           experienced devs, don't bully me or this wbesite please, im still learning lol
