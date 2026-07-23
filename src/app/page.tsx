@@ -85,7 +85,9 @@ export default function ZakatCalculator() {
 
     return nameLower.includes(searchLower) || codeLower.includes(searchLower);
   });
-
+  
+  const [heldLunarYear, setHeldLunarYear] = useState("");
+  
   /* ---------- HANDLE ZAKAT CALCULATION ------------- */
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault(); // this prevented the website reloading before even finishing
@@ -95,6 +97,7 @@ export default function ZakatCalculator() {
 
     setCountryError(false);
     setAmountError(false);
+    setHeldLunarYear("");
 
     if (amount === "" || !country.includes(" - ")) {
       if (amount === "") { setAmountError(true); }
@@ -146,7 +149,6 @@ export default function ZakatCalculator() {
           zakat: zakatDue.toFixed(2), // .toFixed(2) rounds it to 2 decimal places
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#10b981'
         });
       } else {
         // Save an object showing they are exempt
@@ -155,7 +157,6 @@ export default function ZakatCalculator() {
           zakat: "0.00",
           nisabThreshold: current_nisab_CUR.toFixed(2),
           currency: currencyCode,
-          colorCode: '#ef4444'
         });
       }
     } catch (err) {
@@ -328,29 +329,74 @@ export default function ZakatCalculator() {
             { loading ? "Wait..." : (calculating ? "Fetching live data..." : "Calculate Zakat") }
           </button>
         </div>
-
+        
         {/*-------- RESULTS !!! ---------*/}
         { results && (
           <div
-          className={`${premium_div_2} shadow-${results.colorCode} mb-5`}
-          style={{
-            backgroundColor: `${results.colorCode}a0`, 
-            borderColor: `${results.colorCode}bb`
-          }}
+            className={`${premium_div_2} mb-5`}
+            style={{
+              backgroundColor: `${
+                !results.eligible ? '#ef4444'
+                : heldLunarYear === "" ? '#121212'
+                  : heldLunarYear === "Yes" ? '#10b981' : '#ef4444'
+              }a0`,
+              borderColor: `${
+                !results.eligible ? '#ef4444'
+                : heldLunarYear === "" ? '#121212'
+                  : heldLunarYear === "Yes" ? '#10b981' : '#ef4444'
+              }bb`
+            }}
           >
-            <h2 className="font-bold mb-2">Your Zakat Result</h2>
+            
+            <label
+              className={`w-full box-border p-4 border border-white rounded-2xl mb-3`}
+            >
+              The current gold nisab is: {results.nisabThreshold} {results.currency}
+            </label>
+            
             { results.eligible ? (
-              <div className="text-sm md:text-base">
-                <label>Your amount of money exceeds the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
-                <br/><br/>
-                <label className="font-bold text-lg">Your zakat due is: {results.zakat} {results.currency}</label>
-              </div>
+              <>
+                <label className="mb-5">Your total wealth EXCEEDS the current nisab threshold of today</label>
+
+                <label>Has your total wealth sustained this threshold for a whole lunar year?</label>
+                
+                {/* ------------ LUNAR YEAR INPUT --------------- */}
+                <div className="flex flex-row gap-5">
+                  <div>
+                    <input
+                      type="radio"
+                      value="Yes"
+                      name="lunar_year"
+                      checked={heldLunarYear === "Yes"}
+                      onChange={(e) => setHeldLunarYear(e.target.value)}
+                      /> <label>Yes</label>
+                  </div>
+                  <div>
+                    <input
+                      type="radio"
+                      value="No"
+                      name="lunar_year"
+                      checked={heldLunarYear === "No"}
+                      onChange={(e) => setHeldLunarYear(e.target.value)}
+                      /> <label>No</label>
+                  </div>
+                </div>
+
+                { heldLunarYear !== "" && (
+                  <>
+                    {heldLunarYear === "Yes" ? (
+                      <h3>You Zakat due is {results.zakat} {results.currency}</h3>
+                    ) : (
+                      <h3>You are EXEMPT from paying zakat at the moment because your zakatable wealth did not sustain the nisab threshold for a lunar year</h3>
+                    ) }
+                  </>
+                ) }
+              </>
             ) : (
-              <div className="text-sm md:text-base">
-                <label>Your amount of money does NOT exceed the current gold nisab of {results.nisabThreshold} {results.currency} as of today</label>
-                <br/><br/>
-                <label className="font-bold text-lg">You are exempt from paying Zakat at the moment</label>
-              </div>
+              <>
+                <label>Your total wealth does NOT exceed the current nisab threshold of today</label>
+                <h3>You are EXEMPT from paying zakat at the moment</h3>
+              </>
             ) }
           </div>
         ) }
