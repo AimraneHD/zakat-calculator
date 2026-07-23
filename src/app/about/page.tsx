@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import arrow_kinda from "./../arrow_kinda.png";
 
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
@@ -26,7 +28,7 @@ export default function AboutPage() {
         work in progress...
       </label>
       <div className={`${premium_div_2}`}>
-        <h1 className="text-2xl text-emerald-500 text-shadow-lg text-shadow-emerald-800">
+        <h1 className="text-2xl text-emerald-500 text-shadow-lg text-shadow-white/20">
           About Zakat calculations...
         </h1>
       </div>
@@ -36,16 +38,22 @@ export default function AboutPage() {
             here
           </Link>
         </p>
-        <h1 className="text-xl">When does zakat become obligatory?</h1>
+        <h1 className="text-xl text-shadow-lg text-shadow-white/10">When does zakat become obligatory?</h1>
         <p>
           Let's say for example the current gold nisab today is 12000 USD
         </p>
         <p>Zakat becomes obligatory on a person once THREE conditions are ALL satisfied. Not one of them, not two of them, but ALL of them:</p>
-        <div className="flex flex-col md:flex-row md:w-full gap-3">
+        <div className="flex flex-col md:flex-row md:w-full gap-3 mb-3">
           <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">1. The person is a Muslim</div>
           <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">2. The person's total wealth exceeds the nisab threshold<span className="text-white/80">, in this example, has more than a total of 12000 USD</span></div>
           <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">3. The person's total wealth sustained the nisab threshold for a whole lunar year<span className="text-white/80">, in this example, has had more than a total of 12000 USD for a whole lunar year</span></div>
         </div>
+        <Image src={arrow_kinda} alt="down_arrow_kinda" className="w-full h-auto"/>
+
+        <p>If all these conditions are true, then Zakat becomes obligatory and falls due</p>
+        
+        <h1 className="text-xl text-shadow-lg text-shadow-white/10">How is Zakat calculated?</h1>
+        <p>Simple. You multiply 2.5% by your current total wealth. That's it :)</p>
       </div>
     </main>
   );
