@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 // apparently this abomination of a gibberish removes the spinners...
 const remove_arrow_spinners = "[&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]";
 
@@ -24,14 +26,26 @@ export default function AboutPage() {
         work in progress...
       </label>
       <div className={`${premium_div_2}`}>
-        <h3 className="text-2xl">
-          About Zakat calculation
-        </h3>
+        <h1 className="text-2xl text-emerald-500 text-shadow-lg text-shadow-emerald-800">
+          About Zakat calculations...
+        </h1>
       </div>
       <div className={`${premium_div_2}`}>
-        <p className="text-center">
-          *actual explanations...*
+        <p>
+          you can see more information <Link target="_blank" rel="noopener noreferrer" className="text-emerald-500 text-shadow-md text-shadow-emerald-700" href="https://cdn.zakat.org/wp-content/uploads/zakat-book-1.pdf">
+            here
+          </Link>
         </p>
+        <h1 className="text-xl">When does zakat become obligatory?</h1>
+        <p>
+          Let's say for example the current gold nisab today is 12000 USD
+        </p>
+        <p>Zakat becomes obligatory on a person once THREE conditions are ALL satisfied. Not one of them, not two of them, but ALL of them:</p>
+        <div className="flex flex-col md:flex-row md:w-full gap-3">
+          <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">1. The person is a Muslim</div>
+          <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">2. The person's total wealth exceeds the nisab threshold<span className="text-white/80">, in this example, has more than a total of 12000 USD</span></div>
+          <div className="md:w-1/3 md:content-center bg-emerald-700 p-4 rounded-md border border-emerald-500">3. The person's total wealth sustained the nisab threshold for a whole lunar year<span className="text-white/80">, in this example, has had more than a total of 12000 USD for a whole lunar year</span></div>
+        </div>
       </div>
     </main>
   );
