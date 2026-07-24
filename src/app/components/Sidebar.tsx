@@ -58,10 +58,9 @@ export default function Sidebar({sidebarOpen, onClose} : SidebarProps) {
                 <Link
                   // its 404 at the moment, and i dont know what to use as placeholder
                   // for now, but i wanna make a whole different website about me, but not now
-                  href={"/about/developer"}
+                  href={"https://aimrane-haddou.vercel.app/"}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${ pathname === "/about/developer" ? "text-emerald-500" : "text-white"} active:bg-emerald-500 no-underline hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors`}
                   onClick={onClose}
                 >
                   Developper (me :D)
