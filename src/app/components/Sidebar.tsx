@@ -56,8 +56,6 @@ export default function Sidebar({sidebarOpen, onClose} : SidebarProps) {
               </li>
               <li>
                 <Link
-                  // its 404 at the moment, and i dont know what to use as placeholder
-                  // for now, but i wanna make a whole different website about me, but not now
                   href={"https://aimrane-haddou.vercel.app/"}
                   target="_blank"
                   rel="noopener noreferrer"
