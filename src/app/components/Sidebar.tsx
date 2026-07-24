@@ -61,6 +61,7 @@ export default function Sidebar({sidebarOpen, onClose} : SidebarProps) {
                   href={"https://aimrane-haddou.vercel.app/"}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className={`block w-full text-white active:bg-emerald-500 no-underline hover:text-[#1a1a1a] hover:bg-white cursor-pointer transition-colors`}
                   onClick={onClose}
                 >
                   Developper (me :D)
