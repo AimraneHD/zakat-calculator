@@ -125,7 +125,7 @@ export default function ZakatCalculator() {
       
       // example:
       // 1 troy ounce of gold = 4103 usd = USDXAU
-      const ounce_gold_USD = data.rates['USDXAU'] || (1 / data.rates['XAU']);
+      const ounce_gold_USD = data.rates['USDXAU'] || (1 / data.rates['XAU']); // forgot to add "|| (1 / data.rates['XAU'])"
 
       // 1 troy ounce = 31 grams
       // 1 gram of gold = 4103 / 31 = 132.53 usd
