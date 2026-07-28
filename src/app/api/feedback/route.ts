@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   if (!validation.success) {
     return NextResponse.json(
-      { message: "invalid input data", errors: validation.error.format() },
+      { message: "invalid input data" },
       { status: 400 }
     );
   }
@@ -78,7 +78,6 @@ export async function POST(request: NextRequest) {
     user_suggestion: !suggestion ? "No suggestions" : suggestion,
   });
   
-  console.log("============ should work by here by now, line 72")
   return NextResponse.json(
     { message: "Thank you for your feedback :D" },
     { status: 200 }
