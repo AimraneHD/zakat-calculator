@@ -1,60 +1,66 @@
+// just a low bearing file where i practice api routing on...
+
 import { NextResponse, NextRequest } from "next/server";
 import { adminDb } from "../../../../firebaseAdmin";
+import { z } from "zod";
 
-const CHECK_INTERVAL = 12; // hours
+const feedbackSchema = z.object({
+  // optional inputs
+  name: z.string().trim().max(100, "Name too long").optional(),
+  suggestion: z.string().trim().max(2000, "Suggestion too long").optional(),
 
-export const dynamic = "force-dynamic";
+  // required inputs
+  opinion: z.string().trim().min(1, "Opinion required").max(2000, "Opinion too long"),
 
-export async function GET(request: NextRequest) {
-  const apiKey = process.env.METAL_PRICE_API_KEY;
-  const { searchParams } = request.nextUrl;
-  const currency = searchParams.get("currency") || "USD";
+  token: z.string().min(1, "security token required")
+});
 
-  const cacheRef = adminDb.collection("cached_rates_test").doc(currency);
-
-  try {
-    const cacheSnap = await cacheRef.get();
-    
-    if (cacheSnap.exists) {
-      const cachedData = cacheSnap.data();
-      
-      if (cachedData && cachedData.cachedAt) {
-        const now = Date.now();
-        const CHECK_INTERVAL_ms = CHECK_INTERVAL * 3600 * 1000;
-        const cacheAge = now - cachedData.cachedAt;
-
-        if (cacheAge < CHECK_INTERVAL_ms) {
-          return NextResponse.json(cachedData.apiData);
-        }
-      }
-    }
-  } catch (err) {
-    console.log("sum happened in the first try (caching):", err)
-  }
+export async function POST(request: NextRequest) {
+  let body;
 
   try {
-    const CURRENCY_URL = `https://api.metalpriceapi.com/v1/latest?api_key=${apiKey}&currencies=${currency},XAU`;
-    const response = await fetch(CURRENCY_URL);
-
-    if (!response.ok) {
-      throw new Error("sum happened with api fetching idk");
-    }
-
-    const data = await response.json();
-
-    await cacheRef.set({
-      apiData: data,
-      cachedAt: Date.now()
-    });
-
-    return NextResponse.json(data);
-  
+    body = await request.json();
   } catch (err) {
-
-    console.log("sum happened in the firebase, idk tho:", err);
+    console.log("=========== something happened here, line 22");
     return NextResponse.json(
-      {message: "sum happened in firebase idk"},
-      {status: 500}
+      { message: "invalid json payload" },
+      { status: 400 }
     );
   }
+
+  const validation = feedbackSchema.safeParse(body);
+
+  if (!validation.success) {
+    console.log("============== something happened here, line 32");
+    return NextResponse.json(
+      { message: "invalid input data", errors: validation.error.format() },
+      { status: 403 }
+    );
+  }
+
+  const { name, suggestion, opinion, token } = validation.data;
+
+  const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    headers: {"Content-type" : "application/x-www-form-urlencode"},
+    body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${token}`
+  });
+
+  const verifyData = await verifyRes.json();
+
+  if (!verifyData.success) {
+    return NextResponse.json(
+      { message: "you a bot?" },
+      { status: 403 }
+    );
+  }
+
+  const current_time_ms = Date.now().toString();
+
+  const feedbackRef = adminDb.collection("feedback").doc(current_time_ms);
+
+  await feedbackRef.set({
+
+  });
+
 }

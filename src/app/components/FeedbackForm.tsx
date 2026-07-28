@@ -71,6 +71,7 @@ export default function FeedbackForm() {
           <input
             className={`${premium_style} mb-5`}
             placeholder="(optional) Any suggestions... ?"
+            maxLength={2000}
             type='text'
             id="user_suggestion"
             value={suggestion}
@@ -87,6 +88,7 @@ export default function FeedbackForm() {
             type='text'
             value={opinion}
             placeholder="Your honest opinion..."
+            maxLength={2000}
             className={`${premium_style}`}
             onChange={(e) => setOpinion(e.target.value)}
           />
@@ -97,6 +99,7 @@ export default function FeedbackForm() {
             type='text'
             value={username}
             placeholder="(optional) Your name..."
+            maxLength={100}
             className={`m-3 ${premium_style}`}
             onChange={(e) => setUsername(e.target.value)}
           />

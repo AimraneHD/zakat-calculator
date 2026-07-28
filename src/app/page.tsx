@@ -98,7 +98,7 @@ export default function ZakatCalculator() {
     setCountryError(false);
     setAmountError(false);
     setHeldLunarYear("");
-
+    
     if (amount === "" || !country.includes(" - ")) {
       if (amount === "") { setAmountError(true); }
       if (!country.includes(" - ")) { setCountryError(true); }

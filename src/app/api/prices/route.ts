@@ -5,10 +5,24 @@ const CHECK_INTERVAL = 12; // hours
 
 export const dynamic = "force-dynamic";
 
+const countriesRes = await fetch("https://countries.dev/countries");
+const countries = await countriesRes.json();
+
 export async function GET(request: NextRequest) {
   const apiKey = process.env.METAL_PRICE_API_KEY;
   const { searchParams } = request.nextUrl;
   const currency = searchParams.get("currency") || "USD";
+
+  const currencies = countries
+                    .filter((c: any) => (c.currencies && c.name !== "Western Sahara"))
+                    .map((c: any) => c.currencies[0].code);
+
+  if (!currencies.includes(currency)) {
+    return NextResponse.json(
+      { message: `you a bot? cause there was no ${currency} in the dropdown and entering in the input manually wouldn't've done nothing`},
+      { status: 403 }
+    );
+  }
 
   // 1. Reference the cached document using Admin SDK
   // Instead of doc(db, ...), we use adminDb.collection(...).doc(...)
