@@ -77,7 +77,7 @@ export default function ZakatCalculator() {
   ];
 
   const filteredCountries = countries.filter((country: any) => {
-    if (!country.currencies || country.name === "Western Sahara") return false;
+    if (!country.currencies?.[0]?.code || country.name === "Western Sahara") return false;
 
     const searchLower = searchTerm.toLowerCase();
     const nameLower = country.name.toLowerCase();
@@ -250,6 +250,7 @@ export default function ZakatCalculator() {
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
+                    setCountry(e.target.value);
                     setIsOpen(true);
                   }}
                   onFocus={() => setIsOpen(true)}
@@ -258,7 +259,7 @@ export default function ZakatCalculator() {
 
                 <Dropdown
                   isOpen={isOpen && filteredCountries.length > 0}
-                  options={filteredCountries.map((c: any) => `${c.name} - ${c.currencies[0].code}`)}
+                  options={filteredCountries.map((c: any) => `${c.name} - ${c.currencies?.[0]?.code}`)}
                   onSelect={(countryString) => {
                     setSearchTerm(countryString);
                     setCountry(countryString);
@@ -358,7 +359,7 @@ export default function ZakatCalculator() {
               <>
                 <label className="mb-5">Your total wealth EXCEEDS the current nisab threshold of today</label>
 
-                <label>Has your total wealth sustained this threshold for a whole lunar year?</label>
+                <label>Has your overall total wealth sustained this threshold for a whole lunar year?</label>
                 
                 {/* ------------ LUNAR YEAR INPUT --------------- */}
                 <div className="flex flex-row gap-5">
@@ -385,7 +386,7 @@ export default function ZakatCalculator() {
                 { heldLunarYear !== "" && (
                   <>
                     {heldLunarYear === "Yes" ? (
-                      <h3>You Zakat due is {results.zakat} {results.currency}</h3>
+                      <h3>Your Zakat due is {results.zakat} {results.currency}</h3>
                     ) : (
                       <h3>You are EXEMPT from paying zakat at the moment because your zakatable wealth did not sustain the nisab threshold for a lunar year</h3>
                     ) }

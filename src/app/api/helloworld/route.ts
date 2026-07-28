@@ -1,66 +1,81 @@
-// just a low bearing file where i practice api routing on...
-
 import { NextResponse, NextRequest } from "next/server";
 import { adminDb } from "../../../../firebaseAdmin";
-import { z } from "zod";
 
-const feedbackSchema = z.object({
-  // optional inputs
-  name: z.string().trim().max(100, "Name too long").optional(),
-  suggestion: z.string().trim().max(2000, "Suggestion too long").optional(),
+const CHECK_INTERVAL = 12 // hours
 
-  // required inputs
-  opinion: z.string().trim().min(1, "Opinion required").max(2000, "Opinion too long"),
+const countriesRes = await fetch("https://countries.dev/countries");
+const countries = await countriesRes.json();
+const currencies = countries
+                   .filter((c: any) => c.currencies && c.name !== "Western Sahara")
+                   .map((c: any) => c.currencies[0].code);
 
-  token: z.string().min(1, "security token required")
-});
+export const dynamic = "force-dynamic";
 
-export async function POST(request: NextRequest) {
-  let body;
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const currency = (searchParams.get("currency") || "USD").toUpperCase();
 
-  try {
-    body = await request.json();
-  } catch (err) {
-    console.log("=========== something happened here, line 22");
+  if (!currencies.includes(currency)) {
     return NextResponse.json(
-      { message: "invalid json payload" },
+      { message: `invalid currency` },
       { status: 400 }
     );
   }
+  
+  const cacheRef = adminDb.collection("cached_rates").doc(currency);
 
-  const validation = feedbackSchema.safeParse(body);
-
-  if (!validation.success) {
-    console.log("============== something happened here, line 32");
-    return NextResponse.json(
-      { message: "invalid input data", errors: validation.error.format() },
-      { status: 403 }
-    );
+  try {
+    const cacheSnap = await cacheRef.get();
+  
+    /* reminder to myself: cached currency rates are cached like this:
+    {
+      apiData: fetched directly from MetalPriceAPI
+      cachedAt: Date.now()
+    }
+    */
+  
+    if (cacheSnap.exists) {
+      const cacheData = cacheSnap.data();
+      
+      const CHECK_INTERVAL_ms = CHECK_INTERVAL * 3600 * 1000;
+      const now = Date.now();
+      const cacheAge = now - cacheData?.cachedAt || 0; // gemini: "What if someone manually
+      // created a document in the Firebase Console named USD, but forgot to add any 
+      // fields to it? cacheSnap.exists will be true. cacheSnap.data() will return an 
+      // empty object: {}. cacheData.cachedAt will be undefined". cacheAge could've been NaN
+  
+      if (cacheAge <= CHECK_INTERVAL_ms) {
+        return NextResponse.json(cacheData.apiData);
+      }
+      // otherwise, pass directly to the next step after this "if"
+    }
+  } catch (dbError) {
+    console.error("something unexpected happened tryna get() the referenced document")
   }
 
-  const { name, suggestion, opinion, token } = validation.data;
+  const apiKey = process.env.METAL_PRICE_API_KEY;
+  const CURRENCIES_URL = `https://api.metalpriceapi.com/v1/latest?api_key=${apiKey}&currencies=${currency},XAU`;
+  
+  try {
+    const response = await fetch(CURRENCIES_URL);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error("something unexpected happened... try again later")
+    }
 
-  const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
-    method: "POST",
-    headers: {"Content-type" : "application/x-www-form-urlencode"},
-    body: `secret=${process.env.TURNSTILE_SECRET_KEY}&response=${token}`
-  });
+    await cacheRef.set({
+      apiData: data,
+      cachedAt: Date.now(),
+    });
+    return NextResponse.json(data);
 
-  const verifyData = await verifyRes.json();
-
-  if (!verifyData.success) {
+  } catch (err) {
+    console.error("error:", err)
     return NextResponse.json(
-      { message: "you a bot?" },
-      { status: 403 }
+      { message: "something unexpected happened fetching metal prices" },
+      { status: 500 }
     );
   }
-
-  const current_time_ms = Date.now().toString();
-
-  const feedbackRef = adminDb.collection("feedback").doc(current_time_ms);
-
-  await feedbackRef.set({
-
-  });
 
 }

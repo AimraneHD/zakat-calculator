@@ -32,7 +32,6 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch (err) {
-    console.log("======== something happened, line 23")
     return NextResponse.json(
       { message: "invalid json payload" },
       { status: 400 }
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
   const validation = feedbackSchema.safeParse(body);
 
   if (!validation.success) {
-    console.log("======== something happened, line 34")
     return NextResponse.json(
       { message: "invalid input data", errors: validation.error.format() },
       { status: 400 }
@@ -63,7 +61,6 @@ export async function POST(request: NextRequest) {
   const verifyData = await verifyRes.json();
   
   if (!verifyData.success) {
-    console.log("======== something happened, line 54")
     return NextResponse.json(
       { message: "You a bot or sumn?"},
       { status: 403 }

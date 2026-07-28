@@ -15,12 +15,12 @@ export async function GET(request: NextRequest) {
 
   const currencies = countries
                     .filter((c: any) => (c.currencies && c.name !== "Western Sahara"))
-                    .map((c: any) => c.currencies[0].code);
+                    .map((c: any) => c.currencies?.[0]?.code);
 
   if (!currencies.includes(currency)) {
     return NextResponse.json(
       { message: `you a bot? cause there was no ${currency} in the dropdown and entering in the input manually wouldn't've done nothing`},
-      { status: 403 }
+      { status: 400 }
     );
   }
 
@@ -79,6 +79,6 @@ export async function GET(request: NextRequest) {
 
   } catch (err) {
     console.error("Backend fetching error:", err);
-    return NextResponse.json({ error: "Backend fetching error", status: 500 });
+    return NextResponse.json({ error: "Backend fetching error" }, { status: 500 });
   }
 }
