@@ -77,7 +77,7 @@ export default function ZakatCalculator() {
   ];
 
   const filteredCountries = countries.filter((country: any) => {
-    if (!country.currencies?.[0]?.code || country.name === "Western Sahara") return false;
+    if (!country.currencies?.[0]?.code || country.name === "Western Sahara" || country.name === "Israel") return false;
 
     const searchLower = searchTerm.toLowerCase();
     const nameLower = country.name.toLowerCase();
