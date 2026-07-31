@@ -19,8 +19,8 @@ export async function GET(request: NextRequest) {
 
   if (!currencies.includes(currency)) {
     return NextResponse.json(
-      { message: `you a bot? cause there was no ${currency} in the dropdown and entering in the input manually wouldn't've done nothing`},
-      { status: 400 }
+      { message: `you a bot? cause there was no ${currency}`},
+      { status: 403 }
     );
   }
 
