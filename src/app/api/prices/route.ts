@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { adminDb } from "../../../../firebaseAdmin"; // Using the VIP Admin connection!
 
-const CHECK_INTERVAL = 12; // hours
+const CHECK_INTERVAL = 24; // hours
 
 export const dynamic = "force-dynamic";
 
